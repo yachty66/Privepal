@@ -87,42 +87,42 @@ struct ContentView: View {
                     ZStack(alignment: .topLeading) {
                         if messageText.isEmpty {
                             Text("Message")
-                                .foregroundStyle(.gray)
-                                .padding(.top, 8)
-                                .padding(.leading, 4)
+                                .font(.system(size: 18))
+                                .foregroundStyle(.white.opacity(0.6))
+                                .padding(.top, 12)
+                                .padding(.leading, 6)
                         }
                         TextField("", text: $messageText, axis: .vertical)
+                            .font(.system(size: 18))
                             .foregroundStyle(.white)
-                            .padding(.top, 8)
-                            .padding(.leading, 4)
+                            .padding(.top, 12)
+                            .padding(.leading, 6)
                     }
-                    .frame(minHeight: 40)
+                    .frame(minHeight: 48)
                     
                     // Tools Row
                     HStack(spacing: 12) {
                         // Plus Button
                         Button(action: {}) {
                             Image(systemName: "plus")
-                                .font(.system(size: 20, weight: .medium))
+                                .font(.system(size: 22, weight: .regular))
                                 .foregroundStyle(.white)
-                                .frame(width: 36, height: 36)
-                                .background(Color.gray.opacity(0.5))
-                                .clipShape(Circle())
+                                .frame(width: 44, height: 44)
+                                .glassEffect(.regular.interactive(), in: .circle)
                         }
                         
                         // Search Pill
                         Button(action: {}) {
-                            HStack(spacing: 6) {
+                            HStack(spacing: 8) {
                                 Image(systemName: "globe")
-                                    .font(.system(size: 14))
+                                    .font(.system(size: 18))
                                 Text("Search")
-                                    .font(.subheadline)
+                                    .font(.system(size: 16))
                             }
                             .foregroundStyle(.white)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .background(Color.gray.opacity(0.5))
-                            .clipShape(Capsule())
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .glassEffect(.regular.interactive(), in: .capsule)
                         }
                         
                         Spacer()
@@ -130,18 +130,16 @@ struct ContentView: View {
                         // Mic Button
                         Button(action: {}) {
                             Image(systemName: "mic")
-                                .font(.system(size: 20, weight: .medium))
+                                .font(.system(size: 22, weight: .regular))
                                 .foregroundStyle(.white)
-                                .frame(width: 36, height: 36)
-                                .background(Color.gray.opacity(0.5))
-                                .clipShape(Circle())
+                                .frame(width: 44, height: 44)
+                                .glassEffect(.regular.interactive(), in: .circle)
                         }
                     }
                 }
                 .padding(16)
-                .background(Color(red: 0.15, green: 0.15, blue: 0.15))
-                .clipShape(RoundedRectangle(cornerRadius: 32))
-                .padding(.horizontal, 16)
+                .glassEffect(in: .rect(cornerRadius: 36))
+                .padding(.horizontal, 12)
                 .padding(.bottom, 10)
             }
         }
