@@ -82,52 +82,64 @@ struct ContentView: View {
                 Spacer()
                 
                 // Bottom Input Bar
-                HStack(spacing: 12) {
-                    // Plus Button
-                    Button(action: {}) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundStyle(.white)
-                            .frame(width: 36, height: 36)
-                            .background(Color.gray.opacity(0.5))
-                            .clipShape(Circle())
-                    }
-                    
-                    // Search Pill
-                    Button(action: {}) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "globe")
-                                .font(.system(size: 14))
-                            Text("Search")
-                                .font(.subheadline)
-                        }
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(Color.gray.opacity(0.5))
-                        .clipShape(Capsule())
-                    }
-                    
-                    // Text Input
-                    ZStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 12) {
+                    // Text Input Area
+                    ZStack(alignment: .topLeading) {
                         if messageText.isEmpty {
                             Text("Message")
                                 .foregroundStyle(.gray)
+                                .padding(.top, 8)
+                                .padding(.leading, 4)
                         }
-                        TextField("", text: $messageText)
+                        TextField("", text: $messageText, axis: .vertical)
                             .foregroundStyle(.white)
+                            .padding(.top, 8)
+                            .padding(.leading, 4)
                     }
+                    .frame(minHeight: 40)
                     
-                    // Mic Button
-                    Button(action: {}) {
-                        Image(systemName: "mic")
-                            .font(.system(size: 20, weight: .medium))
+                    // Tools Row
+                    HStack(spacing: 12) {
+                        // Plus Button
+                        Button(action: {}) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundStyle(.white)
+                                .frame(width: 36, height: 36)
+                                .background(Color.gray.opacity(0.5))
+                                .clipShape(Circle())
+                        }
+                        
+                        // Search Pill
+                        Button(action: {}) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 14))
+                                Text("Search")
+                                    .font(.subheadline)
+                            }
                             .foregroundStyle(.white)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background(Color.gray.opacity(0.5))
+                            .clipShape(Capsule())
+                        }
+                        
+                        Spacer()
+                        
+                        // Mic Button
+                        Button(action: {}) {
+                            Image(systemName: "mic")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundStyle(.white)
+                                .frame(width: 36, height: 36)
+                                .background(Color.gray.opacity(0.5))
+                                .clipShape(Circle())
+                        }
                     }
-                    .padding(.leading, 4)
                 }
                 .padding(16)
-                .background(Color(red: 0.15, green: 0.15, blue: 0.15)) // Rounded bar background
+                .background(Color(red: 0.15, green: 0.15, blue: 0.15))
                 .clipShape(RoundedRectangle(cornerRadius: 32))
                 .padding(.horizontal, 16)
                 .padding(.bottom, 10)
