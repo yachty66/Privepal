@@ -138,7 +138,12 @@ struct ContentView: View {
                     }
                 }
                 .padding(16)
-                .glassEffect(in: .rect(cornerRadius: 36))
+                .padding(16)
+                .glassEffect(.regular.tint(.black.opacity(0.3)), in: .rect(cornerRadius: 36))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 36)
+                        .stroke(.white.opacity(0.15), lineWidth: 1)
+                )
                 .padding(.horizontal, 12)
                 .padding(.bottom, 10)
             }
