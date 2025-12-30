@@ -149,17 +149,32 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // Mic Button
-                    Button(action: {}) {
-                        Image(systemName: "mic")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .circle)
+                    // Mic Button or Send Button
+                    if messageText.isEmpty {
+                        Button(action: {}) {
+                            Image(systemName: "mic")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundStyle(.white)
+                                .frame(width: 44, height: 44)
+                                .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .circle)
+                        }
+                    } else {
+                        Button(action: {
+                            // Send action
+                            messageText = ""
+                        }) {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(.black)
+                                .frame(width: 44, height: 44)
+                                .background(Circle().fill(.white))
+                        }
+                        .transition(.scale.combined(with: .opacity))
                     }
                 }
             }
             .padding(12)
+            .animation(.bouncy, value: messageText.isEmpty) // Animate the transition
             .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
             .overlay(
                 RoundedRectangle(cornerRadius: 38)
