@@ -7,8 +7,16 @@
 
 import SwiftUI
 
+struct Message: Identifiable {
+    let id = UUID()
+    let text: String
+    let isUser: Bool
+    let thoughtDuration: Int? // nil for user
+}
+
 struct ContentView: View {
     @State private var messageText: String = ""
+    @State private var messages: [Message] = []
     @FocusState private var isFocused: Bool
     
     var body: some View {
@@ -54,43 +62,94 @@ struct ContentView: View {
             .padding(.top, 10)
             .padding(.bottom, 20)
             
-            // Disclaimer Text (Pinned, always visible)
-            Text("AI models can make mistakes. Always check\nimportant info.")
-                .font(.caption)
-                .foregroundStyle(.gray)
-                .multilineTextAlignment(.center)
-                .padding(.top, 10)
-                .padding(.bottom, 20)
+            // Disclaimer Text (Pinned, always visible only in empty state)
+            if messages.isEmpty {
+                Text("AI models can make mistakes. Always check\nimportant info.")
+                    .font(.caption)
+                    .foregroundStyle(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 10)
+                    .padding(.bottom, 20)
+            }
             
             // Scrollable Content Area (Enables swipe dismissal)
             GeometryReader { geometry in
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        Spacer()
-                            
-                        // Center glowing orb/dots
-                        ZStack {
-                            Circle()
-                                .fill(
-                                    RadialGradient(
-                                        colors: [.white.opacity(0.2), .clear],
-                                        center: .center,
-                                        startRadius: 5,
-                                        endRadius: 80
-                                    )
-                                )
-                                .frame(width: 160, height: 160)
+                        if messages.isEmpty {
+                            Spacer()
                                 
-                            Image(systemName: "circle.dotted") // Approximating the dot pattern
-                                .resizable()
-                                .frame(width: 80, height: 80)
-                                .foregroundStyle(.white.opacity(0.1))
+                            // Center glowing orb/dots
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        RadialGradient(
+                                            colors: [.white.opacity(0.2), .clear],
+                                            center: .center,
+                                            startRadius: 5,
+                                            endRadius: 80
+                                        )
+                                    )
+                                    .frame(width: 160, height: 160)
+                                    
+                                Image(systemName: "circle.dotted") // Approximating the dot pattern
+                                    .resizable()
+                                    .frame(width: 80, height: 80)
+                                    .foregroundStyle(.white.opacity(0.1))
+                            }
+                            
+                            Spacer()
+                        } else {
+                            // Chat Messages
+                            LazyVStack(spacing: 24) {
+                                ForEach(messages) { message in
+                                    if message.isUser {
+                                        // User Message
+                                        HStack {
+                                            Spacer()
+                                            Text(message.text)
+                                                .font(.system(size: 17))
+                                                .foregroundStyle(.white)
+                                                .padding(.horizontal, 16)
+                                                .padding(.vertical, 12)
+                                                .background(Color(white: 0.15))
+                                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                                        .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                                                )
+                                        }
+                                        .padding(.leading, 60)
+                                    } else {
+                                        // AI Response
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            if let duration = message.thoughtDuration {
+                                                HStack(spacing: 4) {
+                                                    Text("Thought for \(duration) seconds")
+                                                    Image(systemName: "chevron.right")
+                                                        .font(.system(size: 10, weight: .bold))
+                                                }
+                                                .font(.caption)
+                                                .foregroundStyle(.gray)
+                                            }
+                                            
+                                            Text(message.text)
+                                                .font(.system(size: 17))
+                                                .foregroundStyle(.white)
+                                                .lineSpacing(4)
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.trailing, 20)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, 20)
+                            .padding(.bottom, 100)
                         }
-                        
-                        Spacer()
                     }
                     .frame(maxWidth: .infinity)
-                    .frame(minHeight: geometry.size.height)
+                    .frame(minHeight: messages.isEmpty ? geometry.size.height : nil)
                 }
                 .scrollDismissesKeyboard(.interactively)
                 .onTapGesture {
@@ -160,8 +219,18 @@ struct ContentView: View {
                         }
                     } else {
                         Button(action: {
-                            // Send action
+                            let userMsg = Message(text: messageText, isUser: true, thoughtDuration: nil)
+                            messages.append(userMsg)
+                            let responseText = "Are you tying a knot, shoelaces, or\nsomething else? I'm happy to help if you\nneed instructions on how to tie something\nspecific!"
                             messageText = ""
+                            
+                            // Delayed response simulation
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                let aiMsg = Message(text: responseText, isUser: false, thoughtDuration: 3)
+                                withAnimation {
+                                    messages.append(aiMsg)
+                                }
+                            }
                         }) {
                             Image(systemName: "arrow.up")
                                 .font(.system(size: 20, weight: .bold))
