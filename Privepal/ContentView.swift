@@ -129,7 +129,7 @@ struct ContentView: View {
                             .foregroundStyle(.white)
                             .padding(.vertical, 14)
                             .padding(.horizontal, 20)
-                            .glassEffect(.regular.interactive(), in: .capsule)
+                            .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .capsule)
                         }
                         
                         Spacer()
