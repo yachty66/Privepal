@@ -84,12 +84,12 @@ struct ContentView: View {
                                 .frame(width: 80, height: 80)
                                 .foregroundStyle(.white.opacity(0.1))
                         }
-                        .padding(.bottom, 20)
+                        
+                        Spacer()
                     }
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: geometry.size.height)
                 }
-                .defaultScrollAnchor(.bottom)
                 .scrollDismissesKeyboard(.interactively)
                 .onTapGesture {
                     isFocused = false
