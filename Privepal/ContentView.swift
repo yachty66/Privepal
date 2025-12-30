@@ -19,8 +19,10 @@ struct ContentView: View {
                 HStack {
                     Button(action: {}) {
                         Image(systemName: "line.3.horizontal")
-                            .font(.system(size: 24))
+                            .font(.system(size: 20)) // Slightly smaller icon
                             .foregroundStyle(.white)
+                            .frame(width: 44, height: 44)
+                            .glassEffect(.regular.interactive(), in: .circle)
                     }
                     
                     Spacer()
@@ -35,14 +37,19 @@ struct ContentView: View {
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(.gray)
                         }
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 16)
+                        .glassEffect(.regular.interactive(), in: .capsule)
                     }
                     
                     Spacer()
                     
                     Button(action: {}) {
                         Image(systemName: "square.and.pencil")
-                            .font(.system(size: 24))
+                            .font(.system(size: 20))
                             .foregroundStyle(.white)
+                            .frame(width: 44, height: 44)
+                            .glassEffect(.regular.interactive(), in: .circle)
                     }
                 }
                 .padding(.horizontal)
@@ -82,23 +89,23 @@ struct ContentView: View {
                 Spacer()
                 
                 // Bottom Input Bar
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     // Text Input Area
                     ZStack(alignment: .topLeading) {
                         if messageText.isEmpty {
                             Text("Message")
-                                .font(.system(size: 18))
-                                .foregroundStyle(.white.opacity(0.6))
-                                .padding(.top, 12)
-                                .padding(.leading, 6)
+                                .font(.system(size: 20))
+                                .foregroundStyle(Color(white: 0.25))
+                                .padding(.top, 4)
+                                .padding(.leading, 4)
                         }
                         TextField("", text: $messageText, axis: .vertical)
-                            .font(.system(size: 18))
+                            .font(.system(size: 20))
                             .foregroundStyle(.white)
-                            .padding(.top, 12)
-                            .padding(.leading, 6)
+                            .padding(.top, 4)
+                            .padding(.leading, 4)
                     }
-                    .frame(minHeight: 48)
+                    .frame(minHeight: 52)
                     
                     // Tools Row
                     HStack(spacing: 12) {
@@ -107,7 +114,7 @@ struct ContentView: View {
                             Image(systemName: "plus")
                                 .font(.system(size: 22, weight: .regular))
                                 .foregroundStyle(.white)
-                                .frame(width: 44, height: 44)
+                                .frame(width: 48, height: 48)
                                 .glassEffect(.regular.interactive(), in: .circle)
                         }
                         
@@ -117,11 +124,11 @@ struct ContentView: View {
                                 Image(systemName: "globe")
                                     .font(.system(size: 18))
                                 Text("Search")
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 17))
                             }
                             .foregroundStyle(.white)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .padding(.horizontal, 20)
                             .glassEffect(.regular.interactive(), in: .capsule)
                         }
                         
@@ -132,20 +139,26 @@ struct ContentView: View {
                             Image(systemName: "mic")
                                 .font(.system(size: 22, weight: .regular))
                                 .foregroundStyle(.white)
-                                .frame(width: 44, height: 44)
+                                .frame(width: 48, height: 48)
                                 .glassEffect(.regular.interactive(), in: .circle)
                         }
                     }
                 }
-                .padding(16)
-                .padding(16)
-                .glassEffect(.regular.tint(.black.opacity(0.3)), in: .rect(cornerRadius: 36))
+                .padding(20)
+                .glassEffect(.regular.tint(.black.opacity(0.2)), in: .rect(cornerRadius: 40))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 36)
-                        .stroke(.white.opacity(0.15), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 40)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1
+                        )
                 )
-                .padding(.horizontal, 12)
-                .padding(.bottom, 10)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 12)
             }
         }
         .preferredColorScheme(.dark)
