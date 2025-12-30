@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var messageText: String = ""
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -53,37 +54,45 @@ struct ContentView: View {
             .padding(.top, 10)
             .padding(.bottom, 20)
             
-            Spacer()
-            
-            // Center Content
-            VStack(spacing: 20) {
-                Text("AI models can make mistakes. Always check\nimportant info.")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-                    .multilineTextAlignment(.center)
+            // Scrollable Content Area (Enables swipe dismissal)
+            ScrollView {
+                VStack(spacing: 20) {
+                    Spacer().frame(height: 100)
                     
-                // Placeholder for the center glowing orb/dots
-                ZStack {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [.white.opacity(0.2), .clear],
-                                center: .center,
+                    Text("AI models can make mistakes. Always check\nimportant info.")
+                        .font(.caption)
+                        .foregroundStyle(.gray)
+                        .multilineTextAlignment(.center)
+                        
+                    // Placeholder for the center glowing orb/dots
+                    ZStack {
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [.white.opacity(0.2), .clear],
+                                    center: .center,
                                     startRadius: 5,
                                     endRadius: 80
+                                )
                             )
-                        )
-                        .frame(width: 160, height: 160)
-                        
-                    Image(systemName: "circle.dotted") // Approximating the dot pattern
-                        .resizable()
-                        .frame(width: 80, height: 80)
-                        .foregroundStyle(.white.opacity(0.1))
+                            .frame(width: 160, height: 160)
+                            
+                        Image(systemName: "circle.dotted") // Approximating the dot pattern
+                            .resizable()
+                            .frame(width: 80, height: 80)
+                            .foregroundStyle(.white.opacity(0.1))
+                    }
+                    
+                    Spacer().frame(height: 100)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 60)
             }
-            .padding(.bottom, 40) // Reduced static padding since Spacer handles it
-            
-            Spacer()
+            .defaultScrollAnchor(.bottom)
+            .scrollDismissesKeyboard(.interactively)
+            .onTapGesture {
+                isFocused = false
+            }
         }
         .safeAreaInset(edge: .bottom) {
             // Bottom Input Bar
@@ -96,12 +105,16 @@ struct ContentView: View {
                             .foregroundStyle(Color(white: 0.25))
                             .padding(.top, 4)
                             .padding(.leading, 4)
+                            .onTapGesture {
+                                isFocused = true
+                            }
                     }
                     TextField("", text: $messageText, axis: .vertical)
                         .font(.system(size: 19))
                         .foregroundStyle(.white)
                         .padding(.top, 4)
                         .padding(.leading, 4)
+                        .focused($isFocused)
                 }
                 .frame(minHeight: 40)
                 
