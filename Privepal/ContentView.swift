@@ -89,46 +89,46 @@ struct ContentView: View {
                 Spacer()
                 
                 // Bottom Input Bar
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 12) {
                     // Text Input Area
                     ZStack(alignment: .topLeading) {
                         if messageText.isEmpty {
                             Text("Message")
-                                .font(.system(size: 20))
+                                .font(.system(size: 19))
                                 .foregroundStyle(Color(white: 0.25))
                                 .padding(.top, 4)
                                 .padding(.leading, 4)
                         }
                         TextField("", text: $messageText, axis: .vertical)
-                            .font(.system(size: 20))
+                            .font(.system(size: 19))
                             .foregroundStyle(.white)
                             .padding(.top, 4)
                             .padding(.leading, 4)
                     }
-                    .frame(minHeight: 52)
+                    .frame(minHeight: 40)
                     
                     // Tools Row
                     HStack(spacing: 12) {
                         // Plus Button
                         Button(action: {}) {
                             Image(systemName: "plus")
-                                .font(.system(size: 22, weight: .regular))
+                                .font(.system(size: 20, weight: .medium))
                                 .foregroundStyle(.white)
-                                .frame(width: 48, height: 48)
-                                .glassEffect(.regular.interactive(), in: .circle)
+                                .frame(width: 44, height: 44)
+                                .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .circle)
                         }
                         
                         // Search Pill
                         Button(action: {}) {
                             HStack(spacing: 8) {
                                 Image(systemName: "globe")
-                                    .font(.system(size: 18))
-                                Text("Search")
                                     .font(.system(size: 17))
+                                Text("Search")
+                                    .font(.system(size: 16))
                             }
                             .foregroundStyle(.white)
-                            .padding(.vertical, 14)
-                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
                             .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .capsule)
                         }
                         
@@ -137,24 +137,24 @@ struct ContentView: View {
                         // Mic Button
                         Button(action: {}) {
                             Image(systemName: "mic")
-                                .font(.system(size: 22, weight: .regular))
+                                .font(.system(size: 20, weight: .medium))
                                 .foregroundStyle(.white)
-                                .frame(width: 48, height: 48)
-                                .glassEffect(.regular.interactive(), in: .circle)
+                                .frame(width: 44, height: 44)
+                                .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .circle)
                         }
                     }
                 }
-                .padding(20)
-                .glassEffect(.regular.tint(.black.opacity(0.2)), in: .rect(cornerRadius: 40))
+                .padding(16)
+                .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 40)
+                    RoundedRectangle(cornerRadius: 38)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.2), .white.opacity(0.05)],
+                                colors: [.white.opacity(0.15), .white.opacity(0.02)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 1
+                            lineWidth: 0.5
                         )
                 )
                 .padding(.horizontal, 16)
