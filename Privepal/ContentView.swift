@@ -74,86 +74,123 @@ struct ContentView: View {
             
             // Scrollable Content Area (Enables swipe dismissal)
             GeometryReader { geometry in
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        if messages.isEmpty {
-                            Spacer()
-                                
-                            // Center glowing orb/dots
-                            ZStack {
-                                Circle()
-                                    .fill(
-                                        RadialGradient(
-                                            colors: [.white.opacity(0.2), .clear],
-                                            center: .center,
-                                            startRadius: 5,
-                                            endRadius: 80
-                                        )
-                                    )
-                                    .frame(width: 160, height: 160)
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        VStack(spacing: 0) {
+                            if messages.isEmpty {
+                                Spacer()
                                     
-                                Image(systemName: "circle.dotted") // Approximating the dot pattern
-                                    .resizable()
-                                    .frame(width: 80, height: 80)
-                                    .foregroundStyle(.white.opacity(0.1))
-                            }
-                            
-                            Spacer()
-                        } else {
-                            // Chat Messages
-                            LazyVStack(spacing: 24) {
-                                ForEach(messages) { message in
-                                    if message.isUser {
-                                        // User Message
-                                        HStack {
-                                            Spacer()
-                                            Text(message.text)
-                                                .font(.system(size: 17))
-                                                .foregroundStyle(.white)
-                                                .padding(.horizontal, 16)
-                                                .padding(.vertical, 12)
-                                                .background(Color(white: 0.15))
-                                                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                        .stroke(.white.opacity(0.1), lineWidth: 0.5)
-                                                )
-                                        }
-                                        .padding(.leading, 60)
-                                    } else {
-                                        // AI Response
-                                        VStack(alignment: .leading, spacing: 8) {
-                                            if let duration = message.thoughtDuration {
-                                                HStack(spacing: 4) {
-                                                    Text("Thought for \(duration) seconds")
-                                                    Image(systemName: "chevron.right")
-                                                        .font(.system(size: 10, weight: .bold))
-                                                }
-                                                .font(.caption)
-                                                .foregroundStyle(.gray)
+                                // Center glowing orb/dots
+                                ZStack {
+                                    Circle()
+                                        .fill(
+                                            RadialGradient(
+                                                colors: [.white.opacity(0.2), .clear],
+                                                center: .center,
+                                                startRadius: 5,
+                                                endRadius: 80
+                                            )
+                                        )
+                                        .frame(width: 160, height: 160)
+                                        
+                                    Image(systemName: "circle.dotted") // Approximating the dot pattern
+                                        .resizable()
+                                        .frame(width: 80, height: 80)
+                                        .foregroundStyle(.white.opacity(0.1))
+                                }
+                                
+                                Spacer()
+                            } else {
+                                // Chat Messages
+                                LazyVStack(spacing: 24) {
+                                    ForEach(messages) { message in
+                                        if message.isUser {
+                                            // User Message
+                                            HStack {
+                                                Spacer()
+                                                Text(message.text)
+                                                    .font(.system(size: 17))
+                                                    .foregroundStyle(.white)
+                                                    .padding(.horizontal, 16)
+                                                    .padding(.vertical, 12)
+                                                    .background(Color(white: 0.15))
+                                                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                                            .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                                                    )
                                             }
-                                            
-                                            Text(message.text)
-                                                .font(.system(size: 17))
-                                                .foregroundStyle(.white)
-                                                .lineSpacing(4)
+                                            .padding(.leading, 60)
+                                            .id(message.id)
+                                        } else {
+                                            // AI Response
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                if let duration = message.thoughtDuration {
+                                                    HStack(spacing: 4) {
+                                                        Text("Thought for \(duration) seconds")
+                                                        Image(systemName: "chevron.right")
+                                                            .font(.system(size: 10, weight: .bold))
+                                                    }
+                                                    .font(.caption)
+                                                    .foregroundStyle(.gray)
+                                                }
+                                                
+                                                Text(message.text)
+                                                    .font(.system(size: 17))
+                                                    .foregroundStyle(.white)
+                                                    .lineSpacing(4)
+                                            }
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(.trailing, 20)
+                                            .id(message.id)
                                         }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.trailing, 20)
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.bottom, geometry.size.height) // Allow scrolling items to top
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: messages.isEmpty ? geometry.size.height : nil)
+                    }
+                    .scrollDismissesKeyboard(.interactively)
+                    .onTapGesture {
+                        isFocused = false
+                    }
+                    .onChange(of: messages.count) {
+                        guard !messages.isEmpty else { return }
+                        let lastMessage = messages.last!
+                        
+                        withAnimation {
+                            if lastMessage.isUser {
+                                // User sent message: snap it to top
+                                proxy.scrollTo(lastMessage.id, anchor: .top)
+                            } else {
+                                // AI replied: keep the User's message (context) at the top
+                                if messages.count >= 2 {
+                                    let contextId = messages[messages.count - 2].id
+                                    proxy.scrollTo(contextId, anchor: .top)
+                                } else {
+                                    proxy.scrollTo(lastMessage.id, anchor: .top)
+                                }
+                            }
+                        }
+                    }
+                    // Also scroll when keyboard appears/disappears to keep content in view
+                    .onChange(of: isFocused) {
+                        if isFocused, let lastId = messages.last?.id {
+                            // When keyboard opens, ensure we see the context
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation {
+                                    if let lastMsg = messages.last, !lastMsg.isUser, messages.count >= 2 {
+                                         proxy.scrollTo(messages[messages.count - 2].id, anchor: .top)
+                                    } else {
+                                         proxy.scrollTo(lastId, anchor: .top)
                                     }
                                 }
                             }
-                            .padding(.horizontal)
-                            .padding(.top, 20)
-                            .padding(.bottom, 100)
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(minHeight: messages.isEmpty ? geometry.size.height : nil)
-                }
-                .scrollDismissesKeyboard(.interactively)
-                .onTapGesture {
-                    isFocused = false
                 }
             }
         }
