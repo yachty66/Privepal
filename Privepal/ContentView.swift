@@ -54,16 +54,18 @@ struct ContentView: View {
             .padding(.top, 10)
             .padding(.bottom, 20)
             
+            // Disclaimer Text (Pinned, always visible)
+            Text("AI models can make mistakes. Always check\nimportant info.")
+                .font(.caption)
+                .foregroundStyle(.gray)
+                .multilineTextAlignment(.center)
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+            
             // Scrollable Content Area (Enables swipe dismissal)
             GeometryReader { geometry in
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        Text("AI models can make mistakes. Always check\nimportant info.")
-                            .font(.caption)
-                            .foregroundStyle(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 40)
-                        
                         Spacer()
                             
                         // Center glowing orb/dots
@@ -98,7 +100,7 @@ struct ContentView: View {
         }
         .safeAreaInset(edge: .bottom) {
             // Bottom Input Bar
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 // Text Input Area
                 ZStack(alignment: .topLeading) {
                     if messageText.isEmpty {
@@ -118,7 +120,7 @@ struct ContentView: View {
                         .padding(.leading, 4)
                         .focused($isFocused)
                 }
-                .frame(minHeight: 40)
+                .frame(minHeight: 36)
                 
                 // Tools Row
                 HStack(spacing: 12) {
@@ -157,7 +159,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(12)
             .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
             .overlay(
                 RoundedRectangle(cornerRadius: 38)
@@ -171,7 +173,7 @@ struct ContentView: View {
                     )
             )
             .padding(.horizontal, 16)
-            .padding(.bottom, 10) // Small bottom padding relative to safe area
+            .padding(.bottom, 8) // Small bottom padding relative to safe area
         }
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
