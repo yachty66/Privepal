@@ -55,43 +55,45 @@ struct ContentView: View {
             .padding(.bottom, 20)
             
             // Scrollable Content Area (Enables swipe dismissal)
-            ScrollView {
-                VStack(spacing: 20) {
-                    Spacer().frame(height: 100)
-                    
-                    Text("AI models can make mistakes. Always check\nimportant info.")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                        .multilineTextAlignment(.center)
+            GeometryReader { geometry in
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        Text("AI models can make mistakes. Always check\nimportant info.")
+                            .font(.caption)
+                            .foregroundStyle(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, 40)
                         
-                    // Placeholder for the center glowing orb/dots
-                    ZStack {
-                        Circle()
-                            .fill(
-                                RadialGradient(
-                                    colors: [.white.opacity(0.2), .clear],
-                                    center: .center,
-                                    startRadius: 5,
-                                    endRadius: 80
-                                )
-                            )
-                            .frame(width: 160, height: 160)
+                        Spacer()
                             
-                        Image(systemName: "circle.dotted") // Approximating the dot pattern
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                            .foregroundStyle(.white.opacity(0.1))
+                        // Center glowing orb/dots
+                        ZStack {
+                            Circle()
+                                .fill(
+                                    RadialGradient(
+                                        colors: [.white.opacity(0.2), .clear],
+                                        center: .center,
+                                        startRadius: 5,
+                                        endRadius: 80
+                                    )
+                                )
+                                .frame(width: 160, height: 160)
+                                
+                            Image(systemName: "circle.dotted") // Approximating the dot pattern
+                                .resizable()
+                                .frame(width: 80, height: 80)
+                                .foregroundStyle(.white.opacity(0.1))
+                        }
+                        .padding(.bottom, 20)
                     }
-                    
-                    Spacer().frame(height: 100)
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: geometry.size.height)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 60)
-            }
-            .defaultScrollAnchor(.bottom)
-            .scrollDismissesKeyboard(.interactively)
-            .onTapGesture {
-                isFocused = false
+                .defaultScrollAnchor(.bottom)
+                .scrollDismissesKeyboard(.interactively)
+                .onTapGesture {
+                    isFocused = false
+                }
             }
         }
         .safeAreaInset(edge: .bottom) {
