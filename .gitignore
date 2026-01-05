@@ -1,0 +1,16 @@
+# Xcode
+#
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.playgroundvit-arch
+*.xcuserstate
+
+# Secrets
+#
+Privepal/Secrets.swift
+
+# OS X
+#
+.DS_Store

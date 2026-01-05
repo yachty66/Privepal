@@ -11,7 +11,11 @@ import SwiftUI
 struct PrivepalApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Temporarily showing TinfoilAPITest for testing
+            TinfoilAPITest()
+            
+            // Uncomment this when you're done testing:
+            // ContentView()
         }
     }
 }

@@ -1,0 +1,42 @@
+{
+  "originHash" : "94d697dd836a673b242f060d6a1110c34bf83435ea691ecb52d1d16ab4f539ed",
+  "pins" : [
+    {
+      "identity" : "openai",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MacPaw/OpenAI.git",
+      "state" : {
+        "revision" : "28884fcfb15946b119b6eb3498e5a900c1d8d595",
+        "version" : "0.4.7"
+      }
+    },
+    {
+      "identity" : "swift-http-types",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-http-types",
+      "state" : {
+        "revision" : "45eb0224913ea070ec4fba17291b9e7ecf4749ca",
+        "version" : "1.5.1"
+      }
+    },
+    {
+      "identity" : "swift-openapi-runtime",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-openapi-runtime",
+      "state" : {
+        "revision" : "7cdf33371bf89b23b9cf4fd3ce8d3c825c28fbe8",
+        "version" : "1.9.0"
+      }
+    },
+    {
+      "identity" : "tinfoil-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tinfoilsh/tinfoil-swift.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "473af6675aa788b2466fa37e09e215179f0733d8"
+      }
+    }
+  ],
+  "version" : 3
+}
