@@ -1,2 +1,1 @@
-- add the iphone i have as simulator
-- 
+- for the sake of simplicity i could just drop the chat feature for now 

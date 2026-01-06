@@ -16,7 +16,7 @@ struct ContentView: View {
             // Top Bar
             HStack {
                 Button(action: {}) {
-                    Image(systemName: "line.3.horizontal")
+                    Image(systemName: "gearshape")
                         .font(.system(size: 20)) // Slightly smaller icon
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
