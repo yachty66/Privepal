@@ -7,16 +7,8 @@
 
 import SwiftUI
 
-struct Message: Identifiable {
-    let id = UUID()
-    let text: String
-    let isUser: Bool
-    let thoughtDuration: Int? // nil for user
-}
-
 struct ContentView: View {
-    @State private var messageText: String = ""
-    @State private var messages: [Message] = []
+    @State private var viewModel = ChatViewModel()
     @FocusState private var isFocused: Bool
     
     var body: some View {
@@ -63,7 +55,7 @@ struct ContentView: View {
             .padding(.bottom, 20)
             
             // Disclaimer Text (Pinned, always visible only in empty state)
-            if messages.isEmpty {
+            if viewModel.messages.isEmpty {
                 Text("AI models can make mistakes. Always check\nimportant info.")
                     .font(.caption)
                     .foregroundStyle(.gray)
@@ -77,7 +69,7 @@ struct ContentView: View {
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
-                            if messages.isEmpty {
+                            if viewModel.messages.isEmpty {
                                 Spacer()
                                     
                                 // Center glowing orb/dots
@@ -103,7 +95,7 @@ struct ContentView: View {
                             } else {
                                 // Chat Messages
                                 LazyVStack(spacing: 24) {
-                                    ForEach(messages) { message in
+                                    ForEach(viewModel.messages) { message in
                                         if message.isUser {
                                             // User Message
                                             HStack {
@@ -151,15 +143,15 @@ struct ContentView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(minHeight: messages.isEmpty ? geometry.size.height : nil)
+                        .frame(minHeight: viewModel.messages.isEmpty ? geometry.size.height : nil)
                     }
                     .scrollDismissesKeyboard(.interactively)
                     .onTapGesture {
                         isFocused = false
                     }
-                    .onChange(of: messages.count) {
-                        guard !messages.isEmpty else { return }
-                        let lastMessage = messages.last!
+                    .onChange(of: viewModel.messages.count) {
+                        guard !viewModel.messages.isEmpty else { return }
+                        let lastMessage = viewModel.messages.last!
                         
                         withAnimation {
                             if lastMessage.isUser {
@@ -167,8 +159,8 @@ struct ContentView: View {
                                 proxy.scrollTo(lastMessage.id, anchor: .top)
                             } else {
                                 // AI replied: keep the User's message (context) at the top
-                                if messages.count >= 2 {
-                                    let contextId = messages[messages.count - 2].id
+                                if viewModel.messages.count >= 2 {
+                                    let contextId = viewModel.messages[viewModel.messages.count - 2].id
                                     proxy.scrollTo(contextId, anchor: .top)
                                 } else {
                                     proxy.scrollTo(lastMessage.id, anchor: .top)
@@ -178,12 +170,12 @@ struct ContentView: View {
                     }
                     // Also scroll when keyboard appears/disappears to keep content in view
                     .onChange(of: isFocused) {
-                        if isFocused, let lastId = messages.last?.id {
+                        if isFocused, let lastId = viewModel.messages.last?.id {
                             // When keyboard opens, ensure we see the context
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 withAnimation {
-                                    if let lastMsg = messages.last, !lastMsg.isUser, messages.count >= 2 {
-                                         proxy.scrollTo(messages[messages.count - 2].id, anchor: .top)
+                                    if let lastMsg = viewModel.messages.last, !lastMsg.isUser, viewModel.messages.count >= 2 {
+                                         proxy.scrollTo(viewModel.messages[viewModel.messages.count - 2].id, anchor: .top)
                                     } else {
                                          proxy.scrollTo(lastId, anchor: .top)
                                     }
@@ -199,7 +191,7 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 10) {
                 // Text Input Area
                 ZStack(alignment: .topLeading) {
-                    if messageText.isEmpty {
+                    if viewModel.messageText.isEmpty {
                         Text("Message")
                             .font(.system(size: 19))
                             .foregroundStyle(Color(white: 0.25))
@@ -209,7 +201,7 @@ struct ContentView: View {
                                 isFocused = true
                             }
                     }
-                    TextField("", text: $messageText, axis: .vertical)
+                    TextField("", text: $viewModel.messageText, axis: .vertical)
                         .font(.system(size: 19))
                         .foregroundStyle(.white)
                         .padding(.top, 4)
@@ -246,7 +238,7 @@ struct ContentView: View {
                     Spacer()
                     
                     // Mic Button or Send Button
-                    if messageText.isEmpty {
+                    if viewModel.messageText.isEmpty && !viewModel.isLoading {
                         Button(action: {}) {
                             Image(systemName: "mic")
                                 .font(.system(size: 20, weight: .medium))
@@ -256,31 +248,29 @@ struct ContentView: View {
                         }
                     } else {
                         Button(action: {
-                            let userMsg = Message(text: messageText, isUser: true, thoughtDuration: nil)
-                            messages.append(userMsg)
-                            let responseText = "Are you tying a knot, shoelaces, or\nsomething else? I'm happy to help if you\nneed instructions on how to tie something\nspecific!"
-                            messageText = ""
-                            
-                            // Delayed response simulation
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                let aiMsg = Message(text: responseText, isUser: false, thoughtDuration: 3)
-                                withAnimation {
-                                    messages.append(aiMsg)
+                            viewModel.sendMessage()
+                        }) {
+                            ZStack {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .tint(.black)
+                                } else {
+                                    Image(systemName: "arrow.up")
+                                        .font(.system(size: 20, weight: .bold))
+                                        .foregroundStyle(.black)
                                 }
                             }
-                        }) {
-                            Image(systemName: "arrow.up")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundStyle(.black)
-                                .frame(width: 44, height: 44)
-                                .background(Circle().fill(.white))
+                            .frame(width: 44, height: 44)
+                            .background(Circle().fill(.white))
                         }
+                        .disabled(viewModel.isLoading)
                         .transition(.scale.combined(with: .opacity))
                     }
                 }
             }
             .padding(12)
-            .animation(.bouncy, value: messageText.isEmpty) // Animate the transition
+            .animation(.bouncy, value: viewModel.messageText.isEmpty) // Animate the transition
+            .animation(.bouncy, value: viewModel.isLoading)
             .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
             .overlay(
                 RoundedRectangle(cornerRadius: 38)
