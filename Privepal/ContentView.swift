@@ -35,7 +35,7 @@ struct ContentView: View {
                 
                 Button(action: {}) {
                     HStack(spacing: 4) {
-                        Text("Anthropic: Claude 3...")
+                        Text("Tinfoil: Kimi K2 Thinking")
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundStyle(.white)
