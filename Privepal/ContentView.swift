@@ -168,7 +168,15 @@ struct ContentView: View {
                             }
                         }
                     }
-                    // Also scroll when keyboard appears/disappears to keep content in view
+                    .onChange(of: viewModel.messages.last?.text) {
+                        guard !viewModel.messages.isEmpty else { return }
+                        let lastMessage = viewModel.messages.last!
+                        if !lastMessage.isUser {
+                            withAnimation {
+                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                            }
+                        }
+                    }
                     .onChange(of: isFocused) {
                         if isFocused, let lastId = viewModel.messages.last?.id {
                             // When keyboard opens, ensure we see the context

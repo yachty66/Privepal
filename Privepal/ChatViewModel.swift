@@ -22,18 +22,33 @@ class ChatViewModel {
         messages.append(userMsg)
         
         // 2. Clear input and start loading
-        let currentInput = trimmedText
         messageText = ""
         isLoading = true
         
-        // 3. Get AI response
+        // 3. Get AI response with streaming
         Task {
             do {
-                let response = try await chatService.getResponse(for: messages)
+                // Create placeholders for the AI message
+                await MainActor.run {
+                    let aiMsg = Message(text: "", isUser: false, thoughtDuration: nil)
+                    self.messages.append(aiMsg)
+                }
+                
+                let stream = chatService.getStreamingResponse(for: messages.dropLast()) // Send history except the empty AI message
+                
+                for try await chunk in stream {
+                    await MainActor.run {
+                        if let lastIndex = self.messages.indices.last {
+                            self.messages[lastIndex].text += chunk
+                        }
+                        // Stop loading once we start receiving content
+                        if self.isLoading {
+                            self.isLoading = false
+                        }
+                    }
+                }
                 
                 await MainActor.run {
-                    let aiMsg = Message(text: response, isUser: false, thoughtDuration: 3) // Hardcoded thought duration for now
-                    self.messages.append(aiMsg)
                     self.isLoading = false
                 }
             } catch {
