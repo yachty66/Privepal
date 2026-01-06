@@ -27,7 +27,7 @@ struct ContentView: View {
                 
                 Button(action: {}) {
                     HStack(spacing: 4) {
-                        Text("Tinfoil: Kimi K2 Thinking")
+                        Text("Tinfoil: GPT OSS 120B") //other models: "gpt-oss-120b", "kimi-k2-thinking"
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundStyle(.white)

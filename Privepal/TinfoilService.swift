@@ -32,7 +32,7 @@ class TinfoilService: ChatServiceProtocol {
         // 3. Prepare the query
         let chatQuery = ChatQuery(
             messages: queryMessages,
-            model: "kimi-k2-thinking"
+            model: "gpt-oss-120b" //other models: "gpt-oss-120b", "kimi-k2-thinking"
         )
         
         // 4. Make the request
