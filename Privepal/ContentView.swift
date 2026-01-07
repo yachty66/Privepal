@@ -10,12 +10,15 @@ import SwiftUI
 struct ContentView: View {
     @State private var viewModel = ChatViewModel()
     @FocusState private var isFocused: Bool
+    @State private var showSettings: Bool = false
     
     var body: some View {
         VStack(spacing: 0) {
             // Top Bar
             HStack {
-                Button(action: {}) {
+                Button(action: {
+                    showSettings = true
+                }) {
                     Image(systemName: "gearshape")
                         .font(.system(size: 20)) // Slightly smaller icon
                         .foregroundStyle(.white)
@@ -296,6 +299,9 @@ struct ContentView: View {
         }
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 }
 
