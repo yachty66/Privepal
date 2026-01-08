@@ -128,7 +128,6 @@ struct ContentView: View {
                                     }
                                 }
                                 .padding(.horizontal)
-                                .padding(.bottom, geometry.size.height) // Allow scrolling items to top
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -181,7 +180,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .contentMargins(.bottom, 100, for: .scrollContent)
+                .contentMargins(.bottom, 60, for: .scrollContent)
             }
         }
         .overlay(alignment: .bottom) {
