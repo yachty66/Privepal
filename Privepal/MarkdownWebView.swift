@@ -92,8 +92,8 @@ struct MarkdownWebView: UIViewRepresentable {
                 body {
                     color: white;
                     background-color: transparent;
-                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                    font-size: 15px;
+                    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+                    font-size: 14px;
                     line-height: 1.5;
                     margin: 0;
                     padding: 0;
