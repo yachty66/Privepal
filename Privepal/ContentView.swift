@@ -122,25 +122,8 @@ struct ContentView: View {
                                             .id(message.id)
                                         } else {
                                             // AI Response
-                                            VStack(alignment: .leading, spacing: 8) {
-                                                if let duration = message.thoughtDuration {
-                                                    HStack(spacing: 4) {
-                                                        Text("Thought for \(duration) seconds")
-                                                        Image(systemName: "chevron.right")
-                                                            .font(.system(size: 10, weight: .bold))
-                                                    }
-                                                    .font(.caption)
-                                                    .foregroundStyle(.gray)
-                                                }
-                                                
-                                                Text(LocalizedStringKey(message.text))
-                                                    .font(.system(size: 17))
-                                                    .foregroundStyle(.white)
-                                                    .lineSpacing(4)
-                                            }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(.trailing, 20)
-                                            .id(message.id)
+                                            MessageRowView(message: message)
+                                                .id(message.id)
                                         }
                                     }
                                 }
@@ -276,6 +259,30 @@ struct ContentView: View {
         } message: {
             Text("Your messages are processed using encrypted computing in the cloud, so the chat content stays encrypted while an answer is generated. We don’t store your conversations, and no one can read them.")
         }
+    }
+}
+
+struct MessageRowView: View {
+    let message: Message
+    @State private var height: CGFloat = 44 // Default height
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let duration = message.thoughtDuration {
+                HStack(spacing: 4) {
+                    Text("Thought for \(duration) seconds")
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10, weight: .bold))
+                }
+                .font(.caption)
+                .foregroundStyle(.gray)
+            }
+            
+            MarkdownWebView(markdown: message.text, dynamicHeight: $height)
+                .frame(height: height)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.trailing, 20)
     }
 }
 
