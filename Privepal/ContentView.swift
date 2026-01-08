@@ -126,8 +126,10 @@ struct ContentView: View {
                                                 .id(message.id)
                                         }
                                     }
+                                    
                                 }
                                 .padding(.horizontal)
+                                .padding(.bottom, geometry.size.height)
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -141,29 +143,25 @@ struct ContentView: View {
                         guard !viewModel.messages.isEmpty else { return }
                         let lastMessage = viewModel.messages.last!
                         
-                        withAnimation {
-                            if lastMessage.isUser {
-                                // User sent message: snap it to top
-                                proxy.scrollTo(lastMessage.id, anchor: .top)
-                            } else {
-                                // AI replied: keep the User's message (context) at the top
-                                if viewModel.messages.count >= 2 {
-                                    let contextId = viewModel.messages[viewModel.messages.count - 2].id
-                                    proxy.scrollTo(contextId, anchor: .top)
-                                } else {
+                        DispatchQueue.main.async {
+                            withAnimation {
+                                if lastMessage.isUser {
+                                    // User sent message: snap it to top
                                     proxy.scrollTo(lastMessage.id, anchor: .top)
+                                } else {
+                                    // AI replied: keep the User's message (context) at the top
+                                    if viewModel.messages.count >= 2 {
+                                        let contextId = viewModel.messages[viewModel.messages.count - 2].id
+                                        proxy.scrollTo(contextId, anchor: .top)
+                                    } else {
+                                        proxy.scrollTo(lastMessage.id, anchor: .top)
+                                    }
                                 }
                             }
                         }
                     }
                     .onChange(of: viewModel.messages.last?.text) {
-                        guard !viewModel.messages.isEmpty else { return }
-                        let lastMessage = viewModel.messages.last!
-                        if !lastMessage.isUser {
-                            withAnimation {
-                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
-                            }
-                        }
+                        // Removed auto-scroll to bottom to keep the user's context message pinned to the top
                     }
                     .onChange(of: isFocused) {
                         if isFocused, let lastId = viewModel.messages.last?.id {
