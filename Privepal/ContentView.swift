@@ -201,7 +201,7 @@ struct ContentView: View {
                     ZStack(alignment: .topLeading) {
                         if viewModel.messageText.isEmpty {
                             Text("Message")
-                                .font(.system(size: 19))
+                                .font(.system(size: 16, design: .monospaced))
                                 .foregroundStyle(Color(white: 0.25))
                                 .padding(.top, 10)
                                 .padding(.leading, 12)
@@ -210,8 +210,9 @@ struct ContentView: View {
                                 }
                         }
                         TextField("", text: $viewModel.messageText, axis: .vertical)
-                            .font(.system(size: 19))
+                            .font(.system(size: 19, design: .monospaced))
                             .foregroundStyle(.white)
+                            .tint(.white)
                             .padding(.top, 10)
                             .padding(.leading, 12)
                             .padding(.bottom, 10)

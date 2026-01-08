@@ -1,3 +1,8 @@
 - make sure the chat renders correctly
+    - make the input field super touchy sensitive
+    - arrow when text gets to long
+    - make sender message same font type same as responder message
+    - all text which is getting generated should have same size
+    - input fi
 - implement all other chat specific settings like in apollo
 - submit app to get to the app store screenshot point and make and submit those
