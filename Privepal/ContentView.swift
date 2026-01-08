@@ -133,7 +133,7 @@ struct ContentView: View {
                                                     .foregroundStyle(.gray)
                                                 }
                                                 
-                                                Text(message.text)
+                                                Text(LocalizedStringKey(message.text))
                                                     .font(.system(size: 17))
                                                     .foregroundStyle(.white)
                                                     .lineSpacing(4)
