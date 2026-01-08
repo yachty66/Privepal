@@ -1,6 +1,3 @@
-- new chat button at the top right must work
-- comment out plus, search and recording button for now
-- make sure i understand the current logic how we send requests to tinfoil and stuff
 - make sure the chat renders correctly
 - implement all other chat specific settings like in apollo
 - submit app to get to the app store screenshot point and make and submit those

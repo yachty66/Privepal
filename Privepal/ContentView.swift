@@ -202,15 +202,15 @@ struct ContentView: View {
         }
         .safeAreaInset(edge: .bottom) {
             // Bottom Input Bar
-            VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .bottom, spacing: 12) {
                 // Text Input Area
                 ZStack(alignment: .topLeading) {
                     if viewModel.messageText.isEmpty {
                         Text("Message")
                             .font(.system(size: 19))
                             .foregroundStyle(Color(white: 0.25))
-                            .padding(.top, 4)
-                            .padding(.leading, 4)
+                            .padding(.top, 10)
+                            .padding(.leading, 12)
                             .onTapGesture {
                                 isFocused = true
                             }
@@ -218,71 +218,37 @@ struct ContentView: View {
                     TextField("", text: $viewModel.messageText, axis: .vertical)
                         .font(.system(size: 19))
                         .foregroundStyle(.white)
-                        .padding(.top, 4)
-                        .padding(.leading, 4)
+                        .padding(.top, 10)
+                        .padding(.leading, 12)
+                        .padding(.bottom, 10)
                         .focused($isFocused)
                 }
-                .frame(minHeight: 36)
+                .frame(minHeight: 44)
                 
-                // Tools Row
-                HStack(spacing: 12) {
-                    // Plus Button
-                    Button(action: {}) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .circle)
-                    }
-                    
-                    // Search Pill
-                    Button(action: {}) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "globe")
-                                .font(.system(size: 17))
-                            Text("Search")
-                                .font(.system(size: 16))
-                        }
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .capsule)
-                    }
-                    
-                    Spacer()
-                    
-                    // Mic Button or Send Button
-                    if viewModel.messageText.isEmpty && !viewModel.isLoading {
-                        Button(action: {}) {
-                            Image(systemName: "mic")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundStyle(.white)
-                                .frame(width: 44, height: 44)
-                                .glassEffect(.regular.tint(.white.opacity(0.1)).interactive(), in: .circle)
-                        }
-                    } else {
-                        Button(action: {
-                            viewModel.sendMessage()
-                        }) {
-                            ZStack {
-                                if viewModel.isLoading {
-                                    ProgressView()
-                                        .tint(.black)
-                                } else {
-                                    Image(systemName: "arrow.up")
-                                        .font(.system(size: 20, weight: .bold))
-                                        .foregroundStyle(.black)
-                                }
+                // Send Button (Only visible when typing or loading)
+                if !viewModel.messageText.isEmpty || viewModel.isLoading {
+                    Button(action: {
+                        viewModel.sendMessage()
+                    }) {
+                        ZStack {
+                            if viewModel.isLoading {
+                                ProgressView()
+                                    .tint(.black)
+                            } else {
+                                Image(systemName: "arrow.up")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundStyle(.black)
                             }
-                            .frame(width: 44, height: 44)
-                            .background(Circle().fill(.white))
                         }
-                        .disabled(viewModel.isLoading)
-                        .transition(.scale.combined(with: .opacity))
+                        .frame(width: 36, height: 36)
+                        .background(Circle().fill(.white))
                     }
+                    .disabled(viewModel.isLoading)
+                    .transition(.scale.combined(with: .opacity))
+                    .padding(.bottom, 4) // Align with bottom of text field
                 }
             }
-            .padding(12)
+            .padding(6)
             .animation(.bouncy, value: viewModel.messageText.isEmpty) // Animate the transition
             .animation(.bouncy, value: viewModel.isLoading)
             .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
