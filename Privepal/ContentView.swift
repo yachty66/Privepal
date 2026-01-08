@@ -100,7 +100,7 @@ struct ContentView: View {
                                 Spacer()
                             } else {
                                 // Chat Messages
-                                LazyVStack(spacing: 24) {
+                                LazyVStack(spacing: 12) {
                                     ForEach(viewModel.messages) { message in
                                         let isLast = message.id == viewModel.messages.last?.id
                                         
@@ -127,7 +127,7 @@ struct ContentView: View {
                                                 MessageRowView(message: message)
                                             }
                                         }
-                                        .frame(minHeight: isLast ? (isFocused ? geometry.size.height * 0.4 : geometry.size.height * 0.7) : nil, alignment: .top)
+                                        .frame(minHeight: isLast ? geometry.size.height - 155 : nil, alignment: .top)
                                         .id(message.id)
                                     }
                                 }
@@ -142,11 +142,12 @@ struct ContentView: View {
                     .onTapGesture {
                         isFocused = false
                     }
+                    .contentMargins(.top, 1, for: .scrollContent)
                     .onChange(of: viewModel.messages.count) {
                         guard !viewModel.messages.isEmpty else { return }
                         let lastMessage = viewModel.messages.last!
                         
-                        DispatchQueue.main.async {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             withAnimation {
                                 if lastMessage.isUser {
                                     // User sent message: snap it to top
