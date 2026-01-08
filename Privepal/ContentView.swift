@@ -11,15 +11,16 @@ struct ContentView: View {
     @State private var viewModel = ChatViewModel()
     @FocusState private var isFocused: Bool
     @State private var showSettings: Bool = false
+    @State private var showInfo: Bool = false
     
     var body: some View {
         VStack(spacing: 0) {
             // Top Bar
             HStack {
                 Button(action: {
-                    showSettings = true
+                    showInfo = true
                 }) {
-                    Image(systemName: "gearshape")
+                    Image(systemName: "info.circle")
                         .font(.system(size: 20)) // Slightly smaller icon
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
@@ -299,8 +300,13 @@ struct ContentView: View {
         }
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
+        // .sheet(isPresented: $showSettings) {
+        //     SettingsView()
+        // }
+        .alert("Privacy by design", isPresented: $showInfo) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your messages are processed using encrypted computing in the cloud, so the chat content stays encrypted while an answer is generated. We don’t store your conversations, and no one can read them.")
         }
     }
 }
