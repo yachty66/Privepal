@@ -85,7 +85,7 @@ struct MarkdownWebView: UIViewRepresentable {
             <script src="https://cdn.jsdelivr.net/npm/marked-katex-extension/lib/index.umd.js"></script>
             
             <!-- Highlight.js (Code Highlighting) -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
             <style>
@@ -99,13 +99,61 @@ struct MarkdownWebView: UIViewRepresentable {
                     padding: 0;
                     word-wrap: break-word;
                 }
-                pre {
-                    background: #282c34;
-                    padding: 12px;
+                
+                /* Container for the code block structure */
+                .code-container {
+                    background: #24292e; /* Matches github-dark bg (approx) */
                     border-radius: 8px;
-                    overflow-x: auto;
-                    margin: 8px 0;
+                    margin: 12px 0;
+                    overflow: hidden;
+                    border: 1px solid #444;
                 }
+                
+                /* Header bar with Language and Copy button */
+                .code-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    background: #393e46; /* Slightly lighter header */
+                    padding: 6px 12px;
+                    font-family: inherit;
+                    color: #bbb;
+                    font-size: 13px;
+                    border-bottom: 1px solid #444;
+                }
+                
+                .lang-label {
+                    font-weight: 600;
+                    text-transform: lowercase;
+                }
+                
+                .copy-btn {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 2px;
+                    color: #bbb;
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .copy-btn svg {
+                    width: 16px;
+                    height: 16px;
+                    fill: currentColor;
+                }
+                
+                .copy-btn:hover {
+                    color: white;
+                }
+
+                pre {
+                    margin: 0;
+                    padding: 12px;
+                    overflow-x: auto;
+                    background: transparent; /* Let container bg show through */
+                }
+                
                 code {
                     font-family: "Menlo", "Consolas", monospace;
                     font-size: 0.9em;
@@ -134,19 +182,73 @@ struct MarkdownWebView: UIViewRepresentable {
             <div id="content"></div>
             
             <script>
-                // 1. Configure marked with KaTeX extension and Highlight.js
-                // The extension exposes 'markedKatex' globally
+                // 1. Configure marked
                 marked.use(markedKatex({
                   throwOnError: false
                 }));
+                
+                // Custom renderer for code blocks to wrap them in our structure
+                const renderer = new marked.Renderer();
+                
+                // marked v4+ sends ({ text, lang, escaped }) or just (code, lang) depending on version/options.
+                // But let's stick to standard (code, lang) which works with string concatenation.
+                renderer.code = function({ text, lang, escaped } = {}) {
+                    // Fallback for older signatures or direct string calls (though marked doesn't usually do that anymore)
+                    const codeContent = text || arguments[0]; 
+                    const language = lang || arguments[1] || 'plaintext';
+                    
+                    const validLang = hljs.getLanguage(language) ? language : 'plaintext';
+                    
+                    let highlighted;
+                    try {
+                        highlighted = hljs.highlight(codeContent, { language: validLang }).value;
+                    } catch (e) {
+                         highlighted = codeContent; // fallback
+                    }
+
+                   return `
+                   <div class="code-container">
+                       <div class="code-header">
+                           <span class="lang-label">${language}</span>
+                           <button class="copy-btn" onclick="copyCode(this)">
+                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                           </button>
+                       </div>
+                       <pre><code class="hljs ${validLang}">${highlighted}</code></pre>
+                   </div>
+                   `;
+                };
+                
+                marked.use({ renderer });
 
                 const rawMarkdown = `\(finalEscapedContent)`;
                 
-                // 2. Parse Markdown (math will be rendered by the extension during parsing)
+                // 2. Parse Markdown
                 document.getElementById('content').innerHTML = marked.parse(rawMarkdown);
                 
-                // 3. Highlight Code
-                hljs.highlightAll();
+                // 3. (Highlighting is handled by renderer now)
+                
+                // 4. Copy Function
+                window.copyCode = function(btn) {
+                    const code = btn.closest('.code-container').querySelector('code').innerText;
+                    // Native bridge can be better, but simple clipboard API works on newer iOS webviews
+                    // Or communicate back to swift. For now simpler:
+                    /*
+                       Using a hidden textarea hack is safer in restricted webviews if nav.clipboard fails
+                    */
+                    const textArea = document.createElement("textarea");
+                    textArea.value = code;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        // Feedback
+                        const originalSVG = btn.innerHTML;
+                        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                        setTimeout(() => { btn.innerHTML = originalSVG; }, 1500);
+                    } catch (err) { }
+                    document.body.removeChild(textArea);
+                }
             </script>
         </body>
         </html>
