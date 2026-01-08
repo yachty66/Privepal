@@ -1,4 +1,8 @@
 - make sure the chat renders correctly
+    - make sure its not possible to scroll past the last message
+
+
+
     - make the input field super touchy sensitive
     - arrow when text gets to long
     - make sender message same font type same as responder message

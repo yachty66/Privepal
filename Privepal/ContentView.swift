@@ -102,34 +102,37 @@ struct ContentView: View {
                                 // Chat Messages
                                 LazyVStack(spacing: 24) {
                                     ForEach(viewModel.messages) { message in
-                                        if message.isUser {
-                                            // User Message
-                                            HStack {
-                                                Spacer()
-                                                Text(message.text)
-                                                    .font(.system(size: 14, design: .monospaced))
-                                                    .foregroundStyle(.white)
-                                                    .padding(.horizontal, 16)
-                                                    .padding(.vertical, 12)
-                                                    .background(Color(white: 0.15))
-                                                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                            .stroke(.white.opacity(0.1), lineWidth: 0.5)
-                                                    )
+                                        let isLast = message.id == viewModel.messages.last?.id
+                                        
+                                        VStack(spacing: 0) {
+                                            if message.isUser {
+                                                // User Message
+                                                HStack {
+                                                    Spacer()
+                                                    Text(message.text)
+                                                        .font(.system(size: 14, design: .monospaced))
+                                                        .foregroundStyle(.white)
+                                                        .padding(.horizontal, 16)
+                                                        .padding(.vertical, 12)
+                                                        .background(Color(white: 0.15))
+                                                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                                                                .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                                                        )
+                                                }
+                                                .padding(.leading, 60)
+                                            } else {
+                                                // AI Response
+                                                MessageRowView(message: message)
                                             }
-                                            .padding(.leading, 60)
-                                            .id(message.id)
-                                        } else {
-                                            // AI Response
-                                            MessageRowView(message: message)
-                                                .id(message.id)
                                         }
+                                        .frame(minHeight: isLast ? (isFocused ? geometry.size.height * 0.4 : geometry.size.height * 0.7) : nil, alignment: .top)
+                                        .id(message.id)
                                     }
-                                    
                                 }
+                                .scrollBounceBehavior(.basedOnSize)
                                 .padding(.horizontal)
-                                .padding(.bottom, geometry.size.height)
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -178,7 +181,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .contentMargins(.bottom, 60, for: .scrollContent)
+                .contentMargins(.bottom, 100, for: .scrollContent)
             }
         }
         .overlay(alignment: .bottom) {
