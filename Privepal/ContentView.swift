@@ -46,7 +46,9 @@ struct ContentView: View {
                 
                 Spacer()
                 
-                Button(action: {}) {
+                Button(action: {
+                    viewModel.clearChat()
+                }) {
                     Image(systemName: "square.and.pencil")
                         .font(.system(size: 20))
                         .foregroundStyle(.white)

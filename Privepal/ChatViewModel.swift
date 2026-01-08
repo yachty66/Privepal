@@ -60,4 +60,9 @@ class ChatViewModel {
             }
         }
     }
+    
+    func clearChat() {
+        messages.removeAll()
+        isLoading = false
+    }
 }
