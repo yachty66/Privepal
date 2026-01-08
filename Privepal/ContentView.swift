@@ -107,7 +107,7 @@ struct ContentView: View {
                                             HStack {
                                                 Spacer()
                                                 Text(message.text)
-                                                    .font(.system(size: 17))
+                                                    .font(.system(size: 14, design: .monospaced))
                                                     .foregroundStyle(.white)
                                                     .padding(.horizontal, 16)
                                                     .padding(.vertical, 12)
