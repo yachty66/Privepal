@@ -181,62 +181,74 @@ struct ContentView: View {
                         }
                     }
                 }
+                .contentMargins(.bottom, 100, for: .scrollContent)
             }
         }
-        .safeAreaInset(edge: .bottom) {
-            // Bottom Input Bar
-            HStack(alignment: .bottom, spacing: 12) {
-                // Text Input Area
-                ZStack(alignment: .topLeading) {
-                    if viewModel.messageText.isEmpty {
-                        Text("Message")
+        .overlay(alignment: .bottom) {
+            ZStack(alignment: .bottom) {
+                LinearGradient(
+                    colors: [.black.opacity(0), .black.opacity(0.6), .black],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 100)
+                .padding(.bottom, -40) // Shift down so fade starts behind bar, not above
+                .ignoresSafeArea(edges: .bottom)
+                .allowsHitTesting(false)
+                
+                // Bottom Input Bar
+                HStack(alignment: .bottom, spacing: 12) {
+                    // Text Input Area
+                    ZStack(alignment: .topLeading) {
+                        if viewModel.messageText.isEmpty {
+                            Text("Message")
+                                .font(.system(size: 19))
+                                .foregroundStyle(Color(white: 0.25))
+                                .padding(.top, 10)
+                                .padding(.leading, 12)
+                                .onTapGesture {
+                                    isFocused = true
+                                }
+                        }
+                        TextField("", text: $viewModel.messageText, axis: .vertical)
                             .font(.system(size: 19))
-                            .foregroundStyle(Color(white: 0.25))
+                            .foregroundStyle(.white)
                             .padding(.top, 10)
                             .padding(.leading, 12)
-                            .onTapGesture {
-                                isFocused = true
-                            }
+                            .padding(.bottom, 10)
+                            .focused($isFocused)
                     }
-                    TextField("", text: $viewModel.messageText, axis: .vertical)
-                        .font(.system(size: 19))
-                        .foregroundStyle(.white)
-                        .padding(.top, 10)
-                        .padding(.leading, 12)
-                        .padding(.bottom, 10)
-                        .focused($isFocused)
-                }
-                .frame(minHeight: 44)
-                
-                // Send Button (Only visible when typing or loading)
-                if !viewModel.messageText.isEmpty || viewModel.isLoading {
-                    Button(action: {
-                        viewModel.sendMessage()
-                    }) {
-                        ZStack {
-                            if viewModel.isLoading {
-                                ProgressView()
-                                    .tint(.black)
-                            } else {
-                                Image(systemName: "arrow.up")
+                    .frame(minHeight: 44)
+                    
+                    // Send Button (Only visible when typing or loading)
+                    if !viewModel.messageText.isEmpty || viewModel.isLoading {
+                        Button(action: {
+                            viewModel.sendMessage()
+                        }) {
+                            ZStack {
+                                if viewModel.isLoading {
+                                    ProgressView()
+                                        .tint(.black)
+                                } else {
+                                    Image(systemName: "arrow.up")
                                     .font(.system(size: 20, weight: .bold))
                                     .foregroundStyle(.black)
+                                }
                             }
+                            .frame(width: 36, height: 36)
+                            .background(Circle().fill(.white))
                         }
-                        .frame(width: 36, height: 36)
-                        .background(Circle().fill(.white))
+                        .disabled(viewModel.isLoading)
+                        .transition(.scale.combined(with: .opacity))
+                        .padding(.bottom, 4) // Align with bottom of text field
                     }
-                    .disabled(viewModel.isLoading)
-                    .transition(.scale.combined(with: .opacity))
-                    .padding(.bottom, 4) // Align with bottom of text field
                 }
-            }
-            .padding(6)
-            .animation(.bouncy, value: viewModel.messageText.isEmpty) // Animate the transition
-            .animation(.bouncy, value: viewModel.isLoading)
-            .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
-            .overlay(
-                RoundedRectangle(cornerRadius: 38)
+                .padding(6)
+                .animation(.bouncy, value: viewModel.messageText.isEmpty) // Animate the transition
+                .animation(.bouncy, value: viewModel.isLoading)
+                .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 38)
                     .stroke(
                         LinearGradient(
                             colors: [.white.opacity(0.15), .white.opacity(0.02)],
@@ -245,9 +257,10 @@ struct ContentView: View {
                         ),
                         lineWidth: 0.5
                     )
-            )
-            .padding(.horizontal, 16)
-            .padding(.bottom, 8) // Small bottom padding relative to safe area
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
         }
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
