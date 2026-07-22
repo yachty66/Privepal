@@ -10,6 +10,12 @@ const MODELS = [
   { id: "kimi-k2.6", label: "Smart" },
 ] as const;
 
+const VERIFY_STEPS = [
+  "Contacting encryption proxy",
+  "Checking hardware attestation (AMD SEV-SNP + NVIDIA H100)",
+  "Confirming end-to-end encrypted channel",
+];
+
 export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -18,6 +24,7 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [channelOk, setChannelOk] = useState<boolean | null>(null);
+  const [verifyStep, setVerifyStep] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -29,7 +36,21 @@ export default function Home() {
       .then((r) => r.json())
       .then((s) => setChannelOk(!!s.proxyOk))
       .catch(() => setChannelOk(false));
+    const t1 = setTimeout(() => setVerifyStep(1), 900);
+    const t2 = setTimeout(() => setVerifyStep(2), 2000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, []);
+
+  // final step completes only once the real check has answered
+  useEffect(() => {
+    if (verifyStep === 2 && channelOk !== null) {
+      const t = setTimeout(() => setVerifyStep(3), 900);
+      return () => clearTimeout(t);
+    }
+  }, [verifyStep, channelOk]);
 
   const active = chats.find((c) => c.id === activeId) ?? null;
 
@@ -250,7 +271,9 @@ export default function Home() {
                 <img
                   src="/logo.png"
                   alt="Privepal"
-                  className="mb-6 h-20 w-20"
+                  className={`mb-6 h-20 w-20 ${
+                    verifyStep < 3 ? "animate-pulse" : ""
+                  }`}
                 />
                 <p className="text-2xl font-medium text-neutral-300">
                   Fast. Private. Yours.
@@ -260,43 +283,78 @@ export default function Home() {
                 </p>
                 <Link
                   href="/shield"
-                  className="mt-8 block w-full max-w-md rounded-xl border border-neutral-800 p-4 text-left hover:border-neutral-600"
+                  className="mt-8 block w-full max-w-md rounded-xl border border-neutral-800 p-4 text-left transition-colors hover:border-neutral-600"
                 >
-                  <div className="space-y-2.5 text-[13px]">
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className={`h-2 w-2 shrink-0 rounded-full ${
-                          channelOk === null
-                            ? "animate-pulse bg-neutral-600"
-                            : channelOk
-                              ? "bg-white"
-                              : "bg-neutral-700"
-                        }`}
-                      />
-                      <span className="text-neutral-300">
-                        {channelOk === null
-                          ? "Checking encrypted channel..."
-                          : channelOk
-                            ? "Encrypted channel to sealed AI hardware: live"
-                            : "Encrypted channel down. Chat is disabled, no unencrypted fallback."}
-                      </span>
+                  {verifyStep < 3 ? (
+                    <div className="space-y-3 text-[13px]">
+                      <div className="mb-1 text-[11px] uppercase tracking-widest text-neutral-500">
+                        Verifying private channel
+                      </div>
+                      {VERIFY_STEPS.map((label, i) => (
+                        <div key={label} className="flex items-center gap-2.5">
+                          {i < verifyStep ? (
+                            <svg
+                              viewBox="0 0 24 24"
+                              className="h-3.5 w-3.5 shrink-0 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M20 6L9 17l-5-5" />
+                            </svg>
+                          ) : i === verifyStep ? (
+                            <span className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-neutral-700 border-t-white" />
+                          ) : (
+                            <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-neutral-800" />
+                          )}
+                          <span
+                            className={
+                              i <= verifyStep
+                                ? "text-neutral-300"
+                                : "text-neutral-600"
+                            }
+                          >
+                            {label}
+                            {i === verifyStep ? "..." : ""}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-white" />
-                      <span className="text-neutral-300">
-                        Chats stored only on this device
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-white" />
-                      <span className="text-neutral-300">
-                        No account, no tracking
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-3 text-xs text-neutral-500">
-                    See what is proven vs. what you take on trust &rarr;
-                  </div>
+                  ) : (
+                    <>
+                      <div className="space-y-2.5 text-[13px]">
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className={`h-2 w-2 shrink-0 rounded-full ${
+                              channelOk ? "bg-white" : "bg-neutral-700"
+                            }`}
+                          />
+                          <span className="text-neutral-300">
+                            {channelOk
+                              ? "Encrypted channel to sealed AI hardware: live"
+                              : "Encrypted channel down. Chat is disabled, no unencrypted fallback."}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-white" />
+                          <span className="text-neutral-300">
+                            Chats stored only on this device
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-white" />
+                          <span className="text-neutral-300">
+                            No account, no tracking
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-3 text-xs text-neutral-500">
+                        See what is proven vs. what you take on trust &rarr;
+                      </div>
+                    </>
+                  )}
                 </Link>
               </div>
             ) : (
