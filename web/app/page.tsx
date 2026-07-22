@@ -17,6 +17,7 @@ export default function Home() {
   const [model, setModel] = useState<string>("gpt-oss-120b");
   const [busy, setBusy] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [channelOk, setChannelOk] = useState<boolean | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -24,6 +25,10 @@ export default function Home() {
     const loaded = loadChats();
     setChats(loaded);
     if (loaded.length > 0) setActiveId(loaded[0].id);
+    fetch("/api/shield")
+      .then((r) => r.json())
+      .then((s) => setChannelOk(!!s.proxyOk))
+      .catch(() => setChannelOk(false));
   }, []);
 
   const active = chats.find((c) => c.id === activeId) ?? null;
@@ -253,6 +258,46 @@ export default function Home() {
                 <p className="mt-2 text-sm">
                   Ask anything. Nobody can read it, not even us.
                 </p>
+                <Link
+                  href="/shield"
+                  className="mt-8 block w-full max-w-md rounded-xl border border-neutral-800 p-4 text-left hover:border-neutral-600"
+                >
+                  <div className="space-y-2.5 text-[13px]">
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${
+                          channelOk === null
+                            ? "animate-pulse bg-neutral-600"
+                            : channelOk
+                              ? "bg-white"
+                              : "bg-neutral-700"
+                        }`}
+                      />
+                      <span className="text-neutral-300">
+                        {channelOk === null
+                          ? "Checking encrypted channel..."
+                          : channelOk
+                            ? "Encrypted channel to sealed AI hardware: live"
+                            : "Encrypted channel down. Chat is disabled, no unencrypted fallback."}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-white" />
+                      <span className="text-neutral-300">
+                        Chats stored only on this device
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-white" />
+                      <span className="text-neutral-300">
+                        No account, no tracking
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-xs text-neutral-500">
+                    See what is proven vs. what you take on trust &rarr;
+                  </div>
+                </Link>
               </div>
             ) : (
               active.messages.map((m, i) => (
