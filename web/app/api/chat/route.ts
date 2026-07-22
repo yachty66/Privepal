@@ -20,7 +20,13 @@ export async function POST(req: NextRequest) {
 
   const upstream = await fetch(`${PROXY_URL}/v1/chat/completions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      // keyless proxy mode: it forwards this header to the Privatemode API
+      ...(process.env.PRIVATEMODE_API_KEY
+        ? { Authorization: `Bearer ${process.env.PRIVATEMODE_API_KEY}` }
+        : {}),
+    },
     body: JSON.stringify({
       model,
       messages,
