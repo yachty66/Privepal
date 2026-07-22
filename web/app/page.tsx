@@ -147,14 +147,14 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-dvh bg-zinc-950 text-zinc-100">
+    <div className="flex h-dvh bg-black text-neutral-100">
       {/* Sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-zinc-800 sm:flex">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-800 sm:flex">
         <div className="flex items-center justify-between p-4">
           <span className="text-lg font-semibold tracking-tight">Privepal</span>
           <button
             onClick={createChat}
-            className="rounded-md bg-zinc-800 px-2.5 py-1 text-sm hover:bg-zinc-700"
+            className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
           >
             + New
           </button>
@@ -164,7 +164,7 @@ export default function Home() {
             <div
               key={c.id}
               className={`group flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm ${
-                c.id === activeId ? "bg-zinc-800" : "hover:bg-zinc-900"
+                c.id === activeId ? "bg-neutral-800" : "hover:bg-neutral-900"
               }`}
               onClick={() => setActiveId(c.id)}
             >
@@ -174,14 +174,14 @@ export default function Home() {
                   e.stopPropagation();
                   deleteChat(c.id);
                 }}
-                className="hidden text-zinc-500 hover:text-zinc-200 group-hover:block"
+                className="hidden text-neutral-500 hover:text-neutral-200 group-hover:block"
               >
                 ×
               </button>
             </div>
           ))}
         </nav>
-        <p className="p-4 text-xs leading-relaxed text-zinc-500">
+        <p className="p-4 text-xs leading-relaxed text-neutral-500">
           Private by design. Chats are stored only on this device. Inference
           runs in confidential compute, unreadable even to the operator.
         </p>
@@ -189,31 +189,31 @@ export default function Home() {
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-          <span className="text-sm text-zinc-400 sm:hidden">Privepal</span>
-          <div className="flex gap-1 rounded-lg bg-zinc-900 p-1">
+        <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
+          <span className="text-sm text-neutral-400 sm:hidden">Privepal</span>
+          <div className="flex gap-1 rounded-lg bg-neutral-900 p-1">
             {MODELS.map((m) => (
               <button
                 key={m.id}
                 onClick={() => setModel(m.id)}
                 className={`rounded-md px-3 py-1 text-sm ${
                   model === m.id
-                    ? "bg-zinc-700 text-white"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-neutral-700 text-white"
+                    : "text-neutral-400 hover:text-neutral-200"
                 }`}
               >
                 {m.label}
               </button>
             ))}
           </div>
-          <span className="text-xs text-zinc-600">confidential</span>
+          <span className="text-xs text-neutral-600">confidential</span>
         </header>
 
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-2xl px-4 py-6">
             {!active || active.messages.length === 0 ? (
-              <div className="mt-24 text-center text-zinc-500">
-                <p className="text-2xl font-medium text-zinc-300">
+              <div className="mt-24 text-center text-neutral-500">
+                <p className="text-2xl font-medium text-neutral-300">
                   Fast. Private. Yours.
                 </p>
                 <p className="mt-2 text-sm">
@@ -232,13 +232,13 @@ export default function Home() {
                     className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed ${
                       m.role === "user"
                         ? "bg-white text-black"
-                        : "bg-zinc-900 text-zinc-100"
+                        : "bg-neutral-900 text-neutral-100"
                     }`}
                   >
                     {m.content ||
                       (busy && i === active.messages.length - 1 ? "..." : "")}
                     {m.role === "assistant" && m.ttftMs !== undefined && (
-                      <div className="mt-1 text-[10px] text-zinc-500">
+                      <div className="mt-1 text-[10px] text-neutral-500">
                         first token {m.ttftMs}ms
                       </div>
                     )}
@@ -247,13 +247,13 @@ export default function Home() {
               ))
             )}
             {thinking && (
-              <div className="mb-4 text-sm text-zinc-500">thinking...</div>
+              <div className="mb-4 text-sm text-neutral-500">thinking...</div>
             )}
             <div ref={bottomRef} />
           </div>
         </div>
 
-        <footer className="border-t border-zinc-800 p-4">
+        <footer className="border-t border-neutral-800 p-4">
           <div className="mx-auto flex max-w-2xl items-end gap-2">
             <textarea
               value={input}
@@ -266,12 +266,12 @@ export default function Home() {
               }}
               rows={1}
               placeholder="Message Privepal"
-              className="max-h-40 flex-1 resize-none rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-[15px] outline-none placeholder:text-zinc-600 focus:border-zinc-600"
+              className="max-h-40 flex-1 resize-none rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-[15px] outline-none placeholder:text-neutral-600 focus:border-neutral-600"
             />
             {busy ? (
               <button
                 onClick={stop}
-                className="rounded-xl bg-zinc-800 px-4 py-3 text-sm hover:bg-zinc-700"
+                className="rounded-xl bg-neutral-800 px-4 py-3 text-sm hover:bg-neutral-700"
               >
                 Stop
               </button>
@@ -279,7 +279,7 @@ export default function Home() {
               <button
                 onClick={send}
                 disabled={!input.trim()}
-                className="rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-zinc-200 disabled:opacity-40"
+                className="rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-40"
               >
                 Send
               </button>
