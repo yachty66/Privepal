@@ -12,6 +12,9 @@ export async function GET() {
     const res = await fetch(`${PROXY_URL}/v1/models`, {
       signal: AbortSignal.timeout(5000),
       cache: "no-store",
+      headers: process.env.PRIVATEMODE_API_KEY
+        ? { Authorization: `Bearer ${process.env.PRIVATEMODE_API_KEY}` }
+        : undefined,
     });
     if (res.ok) {
       proxyOk = true;
