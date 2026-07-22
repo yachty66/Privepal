@@ -11,9 +11,9 @@ const MODELS = [
 ] as const;
 
 const VERIFY_STEPS = [
-  "Contacting encryption proxy",
-  "Checking hardware attestation (AMD SEV-SNP + NVIDIA H100)",
-  "Confirming end-to-end encrypted channel",
+  "Connecting securely",
+  "Verifying sealed hardware",
+  "Locking encrypted channel",
 ];
 
 export default function Home() {
