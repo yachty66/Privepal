@@ -206,7 +206,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <span className="text-xs text-zinc-600">🔒 confidential</span>
+          <span className="text-xs text-zinc-600">confidential</span>
         </header>
 
         <div className="flex-1 overflow-y-auto">
@@ -231,7 +231,7 @@ export default function Home() {
                   <div
                     className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed ${
                       m.role === "user"
-                        ? "bg-emerald-700 text-white"
+                        ? "bg-white text-black"
                         : "bg-zinc-900 text-zinc-100"
                     }`}
                   >
@@ -279,7 +279,7 @@ export default function Home() {
               <button
                 onClick={send}
                 disabled={!input.trim()}
-                className="rounded-xl bg-emerald-700 px-4 py-3 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-40"
+                className="rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-zinc-200 disabled:opacity-40"
               >
                 Send
               </button>
