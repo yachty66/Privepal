@@ -75,9 +75,11 @@ export default function Home() {
     if (activeId === id) setActiveId(next[0]?.id ?? null);
   }
 
+  const ready = verifyStep === 3 && channelOk === true;
+
   async function send() {
     const text = input.trim();
-    if (!text || busy) return;
+    if (!text || busy || !ready) return;
 
     let chat = active;
     let base = chats;
@@ -436,7 +438,13 @@ export default function Home() {
                 }
               }}
               rows={1}
-              placeholder="Message Privepal"
+              placeholder={
+                ready
+                  ? "Message Privepal"
+                  : channelOk === false && verifyStep === 3
+                    ? "Encrypted channel down"
+                    : "Verifying private channel..."
+              }
               className="max-h-40 flex-1 resize-none rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-[15px] outline-none placeholder:text-neutral-600 focus:border-neutral-600"
             />
             {busy ? (
@@ -449,7 +457,7 @@ export default function Home() {
             ) : (
               <button
                 onClick={send}
-                disabled={!input.trim()}
+                disabled={!input.trim() || !ready}
                 className="rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-40"
               >
                 Send
