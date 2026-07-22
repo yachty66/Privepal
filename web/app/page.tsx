@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Chat, Message, loadChats, newChat, saveChats } from "@/lib/store";
 import { streamChat } from "@/lib/sse";
 
@@ -216,7 +217,24 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <span className="text-xs text-neutral-600">confidential</span>
+          <Link
+            href="/shield"
+            className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-200"
+            title="How your privacy is protected"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" />
+            </svg>
+            confidential
+          </Link>
         </header>
 
         <div className="flex-1 overflow-y-auto">
