@@ -285,45 +285,79 @@ export default function Home() {
                   href="/shield"
                   className="mt-8 block w-full max-w-md rounded-xl border border-neutral-800 p-4 text-left transition-colors hover:border-neutral-600"
                 >
-                  {verifyStep < 3 ? (
-                    <div className="space-y-3 text-[13px]">
-                      <div className="mb-1 text-[11px] uppercase tracking-widest text-neutral-500">
-                        Verifying private channel
-                      </div>
-                      {VERIFY_STEPS.map((label, i) => (
-                        <div key={label} className="flex items-center gap-2.5">
-                          {i < verifyStep ? (
-                            <svg
-                              viewBox="0 0 24 24"
-                              className="h-3.5 w-3.5 shrink-0 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="M20 6L9 17l-5-5" />
-                            </svg>
-                          ) : i === verifyStep ? (
-                            <span className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-neutral-700 border-t-white" />
-                          ) : (
-                            <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-neutral-800" />
-                          )}
-                          <span
-                            className={
-                              i <= verifyStep
-                                ? "text-neutral-300"
+                  <div className="flex flex-col items-center">
+                    <div className="relative h-24 w-24">
+                      <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
+                        {/* track */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="5"
+                          className="text-neutral-800"
+                        />
+                        {/* progress */}
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="45"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="5"
+                          strokeLinecap="round"
+                          strokeDasharray={2 * Math.PI * 45}
+                          strokeDashoffset={
+                            2 * Math.PI * 45 * (1 - Math.min(verifyStep, 3) / 3)
+                          }
+                          className={`transition-all duration-700 ease-out ${
+                            verifyStep === 3
+                              ? channelOk
+                                ? "text-green-500"
                                 : "text-neutral-600"
-                            }
-                          >
-                            {label}
-                            {i === verifyStep ? "..." : ""}
-                          </span>
-                        </div>
-                      ))}
+                              : "text-white"
+                          }`}
+                        />
+                      </svg>
+                      {verifyStep === 3 && channelOk && (
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="absolute inset-0 m-auto h-10 w-10 text-green-500"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path
+                            d="M20 6L9 17l-5-5"
+                            pathLength="100"
+                            className="animate-draw-check"
+                          />
+                        </svg>
+                      )}
+                      {verifyStep === 3 && !channelOk && (
+                        <span className="absolute inset-0 flex items-center justify-center text-2xl text-neutral-500">
+                          ×
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <>
+
+                    {verifyStep < 3 ? (
+                      <div className="mt-4 text-center text-[13px]">
+                        <div className="mb-1 text-[11px] uppercase tracking-widest text-neutral-500">
+                          Verifying private channel
+                        </div>
+                        <span className="text-neutral-300">
+                          {VERIFY_STEPS[Math.min(verifyStep, 2)]}...
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {verifyStep === 3 && (
+                    <div className="animate-pop-in mt-5">
                       <div className="space-y-2.5 text-[13px]">
                         <div className="flex items-center gap-2.5">
                           <span
@@ -353,7 +387,7 @@ export default function Home() {
                       <div className="mt-3 text-xs text-neutral-500">
                         See what is proven vs. what you take on trust &rarr;
                       </div>
-                    </>
+                    </div>
                   )}
                 </Link>
               </div>
