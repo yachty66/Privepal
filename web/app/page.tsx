@@ -151,7 +151,13 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-800 sm:flex">
         <div className="flex items-center justify-between p-4">
-          <span className="text-lg font-semibold tracking-tight">Privepal</span>
+          <span className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" className="h-6 w-6 rounded-md" />
+            <span className="text-lg font-semibold tracking-tight">
+              Privepal
+            </span>
+          </span>
           <button
             onClick={createChat}
             className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
@@ -190,7 +196,11 @@ export default function Home() {
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-          <span className="text-sm text-neutral-400 sm:hidden">Privepal</span>
+          <span className="flex items-center gap-2 sm:hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" className="h-5 w-5 rounded" />
+            <span className="text-sm text-neutral-400">Privepal</span>
+          </span>
           <div className="flex gap-1 rounded-lg bg-neutral-900 p-1">
             {MODELS.map((m) => (
               <button
@@ -212,7 +222,13 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-2xl px-4 py-6">
             {!active || active.messages.length === 0 ? (
-              <div className="mt-24 text-center text-neutral-500">
+              <div className="mt-24 flex flex-col items-center text-center text-neutral-500">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/logo.png"
+                  alt="Privepal"
+                  className="mb-6 h-20 w-20"
+                />
                 <p className="text-2xl font-medium text-neutral-300">
                   Fast. Private. Yours.
                 </p>
