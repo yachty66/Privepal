@@ -13,8 +13,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://privepal.com"),
   title: "Privepal",
-  description: "Fast, private AI chat. Confidential compute, no stored chats.",
+  description:
+    "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
+  openGraph: {
+    title: "Privepal",
+    description:
+      "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
+    url: "https://privepal.com",
+    siteName: "Privepal",
+    images: [{ url: "/logo.png", width: 256, height: 256 }],
+    locale: "de_DE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Privepal",
+    description:
+      "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
+    images: ["/logo.png"],
+  },
 };
 
 export const viewport: Viewport = {

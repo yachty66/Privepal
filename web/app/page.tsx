@@ -219,10 +219,23 @@ export default function Home() {
           </div>
         ))}
       </nav>
-      <p className="p-4 text-xs leading-relaxed text-neutral-500">
-        Private by design. Chats are stored only on this device. Inference
-        runs in confidential compute, unreadable even to the operator.
-      </p>
+      <div className="p-4 text-xs leading-relaxed text-neutral-500">
+        <p>
+          Private by design. Chats are stored only on this device. Inference
+          runs in confidential compute, unreadable even to the operator.
+        </p>
+        <p className="mt-2 space-x-3">
+          <Link href="/shield" className="hover:text-neutral-300">
+            Security
+          </Link>
+          <Link href="/privacy" className="hover:text-neutral-300">
+            Datenschutz
+          </Link>
+          <Link href="/imprint" className="hover:text-neutral-300">
+            Impressum
+          </Link>
+        </p>
+      </div>
     </>
   );
 
