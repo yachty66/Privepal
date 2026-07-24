@@ -1,303 +1,358 @@
-//
-//  ContentView.swift
-//  Privepal
-//
-//  Created by Max Hager on 12/29/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     @State private var viewModel = ChatViewModel()
     @FocusState private var isFocused: Bool
-    @State private var showSettings: Bool = false
-    @State private var showInfo: Bool = false
-    
+    @State private var showShield = false
+    @State private var showChats = false
+
     var body: some View {
         VStack(spacing: 0) {
             // Top Bar
             HStack {
-                Button(action: {
-                    showInfo = true
-                }) {
-                    Image(systemName: "info.circle")
-                        .font(.system(size: 20)) // Slightly smaller icon
+                Button {
+                    showChats = true
+                } label: {
+                    Image(systemName: "line.3.horizontal")
+                        .font(.system(size: 18))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
                         .glassEffect(.regular.interactive(), in: .circle)
                 }
-                
+
                 Spacer()
-                
-                Button(action: {}) {
-                    HStack(spacing: 4) {
-                        Text("GPT OSS 120B") //other models: "gpt-oss-120b", "kimi-k2-thinking"
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.white)
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(.gray)
+
+                // Model toggle
+                HStack(spacing: 2) {
+                    ForEach(AIModel.allCases) { m in
+                        Button {
+                            viewModel.model = m
+                        } label: {
+                            Text(m.label)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(
+                                    viewModel.model == m ? .black : .white
+                                )
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 16)
+                                .background(
+                                    Capsule().fill(
+                                        viewModel.model == m ? .white : .clear
+                                    )
+                                )
+                        }
                     }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 16)
-                    .glassEffect(.regular.interactive(), in: .capsule)
                 }
-                
+                .padding(3)
+                .glassEffect(.regular, in: .capsule)
+
                 Spacer()
-                
-                Button(action: {
-                    viewModel.clearChat()
-                }) {
-                    Image(systemName: "square.and.pencil")
-                        .font(.system(size: 20))
-                        .foregroundStyle(.white)
+
+                Button {
+                    showShield = true
+                } label: {
+                    Image(systemName: "shield")
+                        .font(.system(size: 18))
+                        .foregroundStyle(
+                            viewModel.ready ? .green : .white
+                        )
                         .frame(width: 44, height: 44)
                         .glassEffect(.regular.interactive(), in: .circle)
                 }
             }
             .padding(.horizontal)
             .padding(.top, 10)
-            .padding(.bottom, 20)
-            
-            // Disclaimer Text (Pinned, always visible only in empty state)
-            if viewModel.messages.isEmpty {
-                Text("AI models can make mistakes. Always check\nimportant info.")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 10)
-                    .padding(.bottom, 20)
-            }
-            
-            // Scrollable Content Area (Enables swipe dismissal)
+            .padding(.bottom, 12)
+
+            // Content
             GeometryReader { geometry in
                 ScrollViewReader { proxy in
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 0) {
-                            if viewModel.messages.isEmpty {
-                                Spacer()
-                                    
-                                // Center glowing orb/dots
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            RadialGradient(
-                                                colors: [.white.opacity(0.2), .clear],
-                                                center: .center,
-                                                startRadius: 5,
-                                                endRadius: 80
-                                            )
-                                        )
-                                        .frame(width: 160, height: 160)
-                                        
-                                    Image(systemName: "circle.dotted") // Approximating the dot pattern
-                                        .resizable()
-                                        .frame(width: 80, height: 80)
-                                        .foregroundStyle(.white.opacity(0.1))
-                                }
-                                
-                                Spacer()
-                            } else {
-                                // Chat Messages
+                            if let chat = viewModel.activeChat,
+                               !chat.messages.isEmpty
+                            {
                                 LazyVStack(spacing: 12) {
-                                    ForEach(viewModel.messages) { message in
-                                        let isLast = message.id == viewModel.messages.last?.id
-                                        
-                                        VStack(spacing: 0) {
-                                            if message.isUser {
-                                                // User Message
-                                                HStack {
-                                                    Spacer()
-                                                    Text(message.text)
-                                                        .font(.system(size: 14, design: .monospaced))
-                                                        .foregroundStyle(.white)
-                                                        .padding(.horizontal, 16)
-                                                        .padding(.vertical, 12)
-                                                        .background(Color(white: 0.15))
-                                                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                                                        .overlay(
-                                                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                                                .stroke(.white.opacity(0.1), lineWidth: 0.5)
-                                                        )
-                                                }
-                                                .padding(.leading, 60)
-                                            } else {
-                                                // AI Response
-                                                MessageRowView(message: message)
-                                            }
-                                        }
-                                        .frame(minHeight: isLast ? geometry.size.height - 155 : nil, alignment: .top)
-                                        .id(message.id)
+                                    ForEach(chat.messages) { message in
+                                        MessageBubble(message: message)
+                                            .id(message.id)
                                     }
+                                    if viewModel.isThinking {
+                                        HStack {
+                                            Text("thinking...")
+                                                .font(
+                                                    .system(
+                                                        size: 13,
+                                                        design: .monospaced
+                                                    )
+                                                )
+                                                .foregroundStyle(
+                                                    Color(white: 0.4)
+                                                )
+                                            Spacer()
+                                        }
+                                    }
+                                    Color.clear.frame(height: 1).id("bottom")
                                 }
-                                .scrollBounceBehavior(.basedOnSize)
                                 .padding(.horizontal)
+                            } else {
+                                VStack(spacing: 20) {
+                                    Image("Logo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 72, height: 72)
+                                        .opacity(
+                                            viewModel.verifyStep < 3 ? 0.6 : 1
+                                        )
+                                    VStack(spacing: 6) {
+                                        Text("Fast. Private. Yours.")
+                                            .font(
+                                                .system(
+                                                    size: 22, weight: .medium
+                                                )
+                                            )
+                                            .foregroundStyle(.white)
+                                        Text(
+                                            "Ask anything. Nobody can read it, not even us."
+                                        )
+                                        .font(.system(size: 13))
+                                        .foregroundStyle(Color(white: 0.45))
+                                    }
+                                    VerifyRingView(
+                                        step: viewModel.verifyStep,
+                                        channelOk: viewModel.channelOk
+                                    )
+                                    .padding(.top, 4)
+                                }
+                                .frame(
+                                    maxWidth: .infinity,
+                                    minHeight: geometry.size.height - 140
+                                )
                             }
                         }
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: viewModel.messages.isEmpty ? geometry.size.height : nil)
                     }
                     .scrollDismissesKeyboard(.interactively)
-                    .onTapGesture {
-                        isFocused = false
-                    }
-                    .contentMargins(.top, 1, for: .scrollContent)
-                    .onChange(of: viewModel.messages.count) {
-                        guard !viewModel.messages.isEmpty else { return }
-                        let lastMessage = viewModel.messages.last!
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation {
-                                if lastMessage.isUser {
-                                    // User sent message: snap it to top
-                                    proxy.scrollTo(lastMessage.id, anchor: .top)
-                                } else {
-                                    // AI replied: keep the User's message (context) at the top
-                                    if viewModel.messages.count >= 2 {
-                                        let contextId = viewModel.messages[viewModel.messages.count - 2].id
-                                        proxy.scrollTo(contextId, anchor: .top)
-                                    } else {
-                                        proxy.scrollTo(lastMessage.id, anchor: .top)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .onChange(of: viewModel.messages.last?.text) {
-                        // Removed auto-scroll to bottom to keep the user's context message pinned to the top
-                    }
-                    .onChange(of: isFocused) {
-                        if isFocused, let lastId = viewModel.messages.last?.id {
-                            // When keyboard opens, ensure we see the context
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                withAnimation {
-                                    if let lastMsg = viewModel.messages.last, !lastMsg.isUser, viewModel.messages.count >= 2 {
-                                         proxy.scrollTo(viewModel.messages[viewModel.messages.count - 2].id, anchor: .top)
-                                    } else {
-                                         proxy.scrollTo(lastId, anchor: .top)
-                                    }
-                                }
-                            }
+                    .onTapGesture { isFocused = false }
+                    .onChange(of: viewModel.activeChat?.messages.last?.text) {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            proxy.scrollTo("bottom", anchor: .bottom)
                         }
                     }
                 }
-                .contentMargins(.bottom, 100, for: .scrollContent)
+                .contentMargins(.bottom, 90, for: .scrollContent)
             }
         }
         .overlay(alignment: .bottom) {
-            ZStack(alignment: .bottom) {
-                LinearGradient(
-                    colors: [.black.opacity(0), .black.opacity(0.6), .black],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 100)
-                .padding(.bottom, -40) // Shift down so fade starts behind bar, not above
-                .ignoresSafeArea(edges: .bottom)
-                .allowsHitTesting(false)
-                
-                // Bottom Input Bar
-                HStack(alignment: .bottom, spacing: 12) {
-                    // Text Input Area
-                    ZStack(alignment: .topLeading) {
-                        if viewModel.messageText.isEmpty {
-                            Text("Message")
-                                .font(.system(size: 14, design: .monospaced))
-                                .foregroundStyle(Color(white: 0.25))
-                                .padding(.top, 10)
-                                .padding(.leading, 12)
-                                .onTapGesture {
-                                    isFocused = true
-                                }
-                        }
-                        TextField("", text: $viewModel.messageText, axis: .vertical)
-                            .font(.system(size: 14, design: .monospaced))
-                            .foregroundStyle(.white)
-                            .tint(.white)
-                            .padding(.top, 10)
-                            .padding(.leading, 12)
-                            .padding(.bottom, 10)
-                            .focused($isFocused)
-                    }
-                    .frame(minHeight: 44)
-                    
-                    // Send Button (Only visible when typing or loading)
-                    if !viewModel.messageText.isEmpty || viewModel.isLoading {
-                        Button(action: {
-                            viewModel.sendMessage()
-                        }) {
-                            ZStack {
-                                if viewModel.isLoading {
-                                    ProgressView()
-                                        .tint(.black)
-                                } else {
-                                    Image(systemName: "arrow.up")
-                                    .font(.system(size: 20, weight: .bold))
-                                    .foregroundStyle(.black)
-                                }
-                            }
-                            .frame(width: 36, height: 36)
-                            .background(Circle().fill(.white))
-                        }
-                        .disabled(viewModel.isLoading)
-                        .transition(.scale.combined(with: .opacity))
-                        .padding(.bottom, 4) // Align with bottom of text field
-                    }
-                }
-                .padding(6)
-                .animation(.bouncy, value: viewModel.messageText.isEmpty) // Animate the transition
-                .animation(.bouncy, value: viewModel.isLoading)
-                .glassEffect(.regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 38)
-                    .stroke(
-                        LinearGradient(
-                            colors: [.white.opacity(0.15), .white.opacity(0.02)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        lineWidth: 0.5
-                    )
-                )
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
-            }
+            inputBar
         }
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
-        // .sheet(isPresented: $showSettings) {
-        //     SettingsView()
-        // }
-        .alert("Privacy by design", isPresented: $showInfo) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Your messages are processed using encrypted computing in the cloud, so the chat content stays encrypted while an answer is generated. We don’t store your conversations, and no one can read them.")
+        .sheet(isPresented: $showShield) {
+            ShieldView(
+                channelOk: viewModel.channelOk,
+                chatCount: viewModel.store.chats.count,
+                messageCount: viewModel.store.chats.reduce(0) {
+                    $0 + $1.messages.count
+                }
+            )
+        }
+        .sheet(isPresented: $showChats) {
+            ChatListView(viewModel: viewModel)
+        }
+    }
+
+    private var inputBar: some View {
+        HStack(alignment: .bottom, spacing: 12) {
+            ZStack(alignment: .topLeading) {
+                if viewModel.messageText.isEmpty {
+                    Text(
+                        viewModel.ready
+                            ? "Message Privepal"
+                            : viewModel.verifyStep == 3
+                                ? "Encrypted channel down"
+                                : "Verifying private channel..."
+                    )
+                    .font(.system(size: 14, design: .monospaced))
+                    .foregroundStyle(Color(white: 0.3))
+                    .padding(.top, 10)
+                    .padding(.leading, 12)
+                    .onTapGesture { isFocused = true }
+                }
+                TextField("", text: $viewModel.messageText, axis: .vertical)
+                    .font(.system(size: 14, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .tint(.white)
+                    .padding(.top, 10)
+                    .padding(.leading, 12)
+                    .padding(.bottom, 10)
+                    .focused($isFocused)
+            }
+            .frame(minHeight: 44)
+
+            if !viewModel.messageText.isEmpty || viewModel.isLoading {
+                Button {
+                    viewModel.isLoading
+                        ? viewModel.stop() : viewModel.sendMessage()
+                } label: {
+                    ZStack {
+                        if viewModel.isLoading {
+                            Image(systemName: "stop.fill")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.black)
+                        } else {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(.black)
+                        }
+                    }
+                    .frame(width: 36, height: 36)
+                    .background(Circle().fill(.white))
+                    .opacity(viewModel.ready ? 1 : 0.4)
+                }
+                .disabled(!viewModel.ready)
+                .transition(.scale.combined(with: .opacity))
+                .padding(.bottom, 4)
+            }
+        }
+        .padding(6)
+        .animation(.bouncy, value: viewModel.messageText.isEmpty)
+        .animation(.bouncy, value: viewModel.isLoading)
+        .glassEffect(
+            .regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 38)
+                .stroke(
+                    LinearGradient(
+                        colors: [.white.opacity(0.15), .white.opacity(0.02)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 0.5
+                )
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+    }
+}
+
+struct MessageBubble: View {
+    let message: Message
+
+    var body: some View {
+        if message.isUser {
+            HStack {
+                Spacer()
+                Text(message.text)
+                    .font(.system(size: 14, design: .monospaced))
+                    .foregroundStyle(.black)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(.white)
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    )
+            }
+            .padding(.leading, 60)
+        } else {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(
+                    (try? AttributedString(
+                        markdown: message.text,
+                        options: .init(
+                            interpretedSyntax:
+                                .inlineOnlyPreservingWhitespace
+                        )
+                    )) ?? AttributedString(message.text)
+                )
+                .font(.system(size: 15))
+                .foregroundStyle(Color(white: 0.9))
+                .textSelection(.enabled)
+
+                if let ttft = message.ttftMs {
+                    Text("first token \(ttft)ms")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundStyle(Color(white: 0.35))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.trailing, 20)
         }
     }
 }
 
-struct MessageRowView: View {
-    let message: Message
-    @State private var height: CGFloat = 44 // Default height
-    
+struct ChatListView: View {
+    @Bindable var viewModel: ChatViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var confirmWipe = false
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let duration = message.thoughtDuration {
-                HStack(spacing: 4) {
-                    Text("Thought for \(duration) seconds")
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .bold))
+        NavigationStack {
+            List {
+                ForEach(viewModel.store.chats) { chat in
+                    Button {
+                        viewModel.activeChatId = chat.id
+                        dismiss()
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(chat.title)
+                                .foregroundStyle(.white)
+                                .lineLimit(1)
+                            Text(
+                                chat.updatedAt.formatted(
+                                    date: .abbreviated, time: .shortened
+                                )
+                            )
+                            .font(.caption2)
+                            .foregroundStyle(Color(white: 0.4))
+                        }
+                    }
+                    .listRowBackground(Color(white: 0.08))
                 }
-                .font(.caption)
-                .foregroundStyle(.gray)
+                .onDelete { indexSet in
+                    for i in indexSet {
+                        viewModel.deleteChat(viewModel.store.chats[i])
+                    }
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        confirmWipe = true
+                    } label: {
+                        Text("Wipe all chats from this device")
+                    }
+                    .listRowBackground(Color(white: 0.08))
+                }
             }
-            
-            MarkdownWebView(markdown: message.text, dynamicHeight: $height)
-                .frame(height: height)
+            .scrollContentBackground(.hidden)
+            .background(Color.black)
+            .navigationTitle("Chats")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Done") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        viewModel.newChat()
+                        dismiss()
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
+            }
+            .confirmationDialog(
+                "Delete all chats from this device? This cannot be undone.",
+                isPresented: $confirmWipe,
+                titleVisibility: .visible
+            ) {
+                Button("Wipe everything", role: .destructive) {
+                    viewModel.wipeAll()
+                    dismiss()
+                }
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.trailing, 20)
+        .preferredColorScheme(.dark)
     }
 }
 
