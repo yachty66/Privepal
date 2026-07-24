@@ -224,6 +224,17 @@ export default function Home() {
           Private by design. Chats are stored only on this device. Inference
           runs in confidential compute, unreadable even to the operator.
         </p>
+        <button
+          onClick={() => {
+            if (confirm("Delete all chats from this device? This cannot be undone.")) {
+              persist([]);
+              setActiveId(null);
+            }
+          }}
+          className="mt-3 w-full rounded-md border border-neutral-800 px-2 py-1.5 text-left text-xs text-neutral-400 hover:border-neutral-600 hover:text-neutral-200"
+        >
+          Wipe all chats from this device
+        </button>
         <p className="mt-2 space-x-3">
           <Link href="/shield" className="hover:text-neutral-300">
             Security

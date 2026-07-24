@@ -36,6 +36,9 @@ export const metadata: Metadata = {
   },
 };
 
+// nonce-based CSP requires per-request rendering
+export const dynamic = "force-dynamic";
+
 export const viewport: Viewport = {
   themeColor: "#000000",
   viewportFit: "cover",
