@@ -22,6 +22,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [model, setModel] = useState<string>("gpt-oss-120b");
   const [busy, setBusy] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [channelOk, setChannelOk] = useState<boolean | null>(null);
   const [verifyStep, setVerifyStep] = useState(0);
@@ -67,6 +68,7 @@ export default function Home() {
     const c = newChat(model);
     persist([c, ...chats]);
     setActiveId(c.id);
+    setSidebarOpen(false);
   }
 
   function deleteChat(id: string) {
@@ -175,61 +177,94 @@ export default function Home() {
     abortRef.current?.abort();
   }
 
+  const sidebarContent = (
+    <>
+      <div className="flex items-center justify-between p-4">
+        <span className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="" className="h-6 w-6 rounded-md" />
+          <span className="text-lg font-semibold tracking-tight">
+            Privepal
+          </span>
+        </span>
+        <button
+          onClick={createChat}
+          className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
+        >
+          + New
+        </button>
+      </div>
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2">
+        {chats.map((c) => (
+          <div
+            key={c.id}
+            className={`group flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm ${
+              c.id === activeId ? "bg-neutral-800" : "hover:bg-neutral-900"
+            }`}
+            onClick={() => {
+              setActiveId(c.id);
+              setSidebarOpen(false);
+            }}
+          >
+            <span className="truncate">{c.title}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteChat(c.id);
+              }}
+              className="text-neutral-500 hover:text-neutral-200 sm:hidden sm:group-hover:block"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </nav>
+      <p className="p-4 text-xs leading-relaxed text-neutral-500">
+        Private by design. Chats are stored only on this device. Inference
+        runs in confidential compute, unreadable even to the operator.
+      </p>
+    </>
+  );
+
   return (
     <div className="flex h-dvh bg-black text-neutral-100">
-      {/* Sidebar */}
+      {/* Sidebar (desktop) */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-800 sm:flex">
-        <div className="flex items-center justify-between p-4">
-          <span className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="" className="h-6 w-6 rounded-md" />
-            <span className="text-lg font-semibold tracking-tight">
-              Privepal
-            </span>
-          </span>
-          <button
-            onClick={createChat}
-            className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
-          >
-            + New
-          </button>
-        </div>
-        <nav className="flex-1 space-y-0.5 overflow-y-auto px-2">
-          {chats.map((c) => (
-            <div
-              key={c.id}
-              className={`group flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm ${
-                c.id === activeId ? "bg-neutral-800" : "hover:bg-neutral-900"
-              }`}
-              onClick={() => setActiveId(c.id)}
-            >
-              <span className="truncate">{c.title}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteChat(c.id);
-                }}
-                className="hidden text-neutral-500 hover:text-neutral-200 group-hover:block"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </nav>
-        <p className="p-4 text-xs leading-relaxed text-neutral-500">
-          Private by design. Chats are stored only on this device. Inference
-          runs in confidential compute, unreadable even to the operator.
-        </p>
+        {sidebarContent}
       </aside>
+
+      {/* Sidebar (mobile drawer) */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 sm:hidden">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-neutral-800 bg-black pb-[env(safe-area-inset-bottom)]">
+            {sidebarContent}
+          </aside>
+        </div>
+      )}
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
-          <span className="flex items-center gap-2 sm:hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="" className="h-5 w-5 rounded" />
-            <span className="text-sm text-neutral-400">Privepal</span>
-          </span>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open chats"
+            className="-ml-1 p-1 text-neutral-400 hover:text-neutral-200 sm:hidden"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <div className="flex gap-1 rounded-lg bg-neutral-900 p-1">
             {MODELS.map((m) => (
               <button
@@ -268,7 +303,7 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-2xl px-4 py-6">
             {!active || active.messages.length === 0 ? (
-              <div className="mt-24 flex flex-col items-center text-center text-neutral-500">
+              <div className="mt-10 flex flex-col items-center text-center text-neutral-500 sm:mt-24">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/logo.png"
@@ -426,7 +461,7 @@ export default function Home() {
           </div>
         </div>
 
-        <footer className="border-t border-neutral-800 p-4">
+        <footer className="border-t border-neutral-800 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="mx-auto flex max-w-2xl items-end gap-2">
             <textarea
               value={input}
@@ -445,7 +480,7 @@ export default function Home() {
                     ? "Encrypted channel down"
                     : "Verifying private channel..."
               }
-              className="max-h-40 flex-1 resize-none rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-[15px] outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+              className="max-h-40 flex-1 resize-none rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-3 text-base outline-none placeholder:text-neutral-600 focus:border-neutral-600 sm:text-[15px]"
             />
             {busy ? (
               <button
