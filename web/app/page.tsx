@@ -485,7 +485,7 @@ export default function Home() {
             {busy ? (
               <button
                 onClick={stop}
-                className="rounded-xl bg-neutral-800 px-4 py-3 text-sm hover:bg-neutral-700"
+                className="self-stretch rounded-xl bg-neutral-800 px-4 text-sm hover:bg-neutral-700"
               >
                 Stop
               </button>
@@ -493,7 +493,7 @@ export default function Home() {
               <button
                 onClick={send}
                 disabled={!input.trim() || !ready}
-                className="rounded-xl bg-white px-4 py-3 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-40"
+                className="self-stretch rounded-xl bg-white px-4 text-sm font-medium text-black hover:bg-neutral-200 disabled:opacity-40"
               >
                 Send
               </button>
