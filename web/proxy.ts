@@ -18,7 +18,8 @@ export function proxy(request: NextRequest) {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
+    // http localhost assets would get force-upgraded to https and fail in dev
+    ...(isDev ? [] : ["upgrade-insecure-requests"]),
   ].join("; ");
 
   const requestHeaders = new Headers(request.headers);

@@ -13,10 +13,16 @@ const securityHeaders = [
   },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
-  },
+  // HSTS in prod only: on localhost it poisons the browser's HSTS cache and
+  // force-upgrades all dev requests to https, breaking every asset load
+  ...(process.env.NODE_ENV === "production"
+    ? [
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+      ]
+    : []),
 ];
 
 const nextConfig: NextConfig = {
