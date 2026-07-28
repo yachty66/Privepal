@@ -10,6 +10,14 @@ const PROXY_URL = process.env.PRIVATEMODE_PROXY_URL ?? "http://localhost:8080";
 
 const ALLOWED_MODELS = new Set(["gpt-oss-120b", "kimi-k2.6"]);
 
+// Identity, added server-side (clients can only send user/assistant roles).
+// Deliberately honest: Privepal identity, no lying about the underlying model.
+const SYSTEM_PROMPT = `You are Privepal, a private AI chat assistant (privepal.com). You run on open-source models served inside confidential-computing hardware, so conversations cannot be read by anyone, not even Privepal's operators, and chats are stored only on the user's device.
+
+If asked who or what you are, say you are Privepal. Do not introduce yourself as ChatGPT, OpenAI, Kimi, or Moonshot. If someone specifically asks which underlying model powers you, answer honestly: Privepal serves open-source models (currently gpt-oss-120b by OpenAI and Kimi K2.6 by Moonshot AI) inside sealed hardware.
+
+Be helpful, direct, and concise.`;
+
 // Abuse limits per IP: enough for heavy personal use, hostile to scripts.
 const WINDOW_MS = 60_000;
 const MAX_PER_WINDOW = 20;
@@ -109,9 +117,12 @@ export async function POST(req: NextRequest) {
     },
     body: JSON.stringify({
       model,
-      messages: (messages as { role: string; content: string }[]).map(
-        ({ role, content }) => ({ role, content })
-      ),
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        ...(messages as { role: string; content: string }[]).map(
+          ({ role, content }) => ({ role, content })
+        ),
+      ],
       stream: true,
       max_tokens: 4096,
       // keep answers snappy: minimize hidden reasoning where supported
