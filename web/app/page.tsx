@@ -12,6 +12,61 @@ const MODELS = [
   { id: "kimi-k2.6", label: "Smart" },
 ] as const;
 
+function CopyButton({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        });
+      }}
+      title="Copy"
+      className={`mt-1 flex items-center gap-1 text-[11px] text-neutral-600 opacity-60 transition-opacity hover:text-neutral-300 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 ${className}`}
+    >
+      {copied ? (
+        <>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          copied
+        </>
+      ) : (
+        <>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          copy
+        </>
+      )}
+    </button>
+  );
+}
+
 const VERIFY_STEPS = [
   "Connecting securely",
   "Verifying sealed hardware",
@@ -493,8 +548,8 @@ export default function Home() {
               active.messages.map((m, i) => (
                 <div
                   key={i}
-                  className={`mb-4 flex ${
-                    m.role === "user" ? "justify-end" : "justify-start"
+                  className={`group mb-4 flex flex-col ${
+                    m.role === "user" ? "items-end" : "items-start"
                   }`}
                 >
                   <div
@@ -516,6 +571,12 @@ export default function Home() {
                       m.content
                     )}
                   </div>
+                  {m.content && (
+                    <CopyButton
+                      text={m.content}
+                      className={m.role === "user" ? "mr-1" : "ml-1"}
+                    />
+                  )}
                 </div>
               ))
             )}
