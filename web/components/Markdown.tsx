@@ -2,6 +2,17 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
+
+// Models emit LaTeX with \[...\] and \(...\) delimiters; remark-math only
+// understands $...$ and $$...$$, so normalize first.
+function normalizeMath(src: string): string {
+  return src
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_, m) => `\n$$\n${m}\n$$\n`)
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_, m) => `$${m}$`);
+}
 
 // Renders assistant messages as markdown. react-markdown builds React
 // elements (no innerHTML), so model output cannot inject markup or scripts.
@@ -12,7 +23,8 @@ export default function Markdown({ children }: { children: string }) {
   return (
     <div className="pp-markdown min-w-0 text-[15px] leading-relaxed">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[[rehypeKatex, { output: "html" }]]}
         components={{
           img: ({ alt }) => <span className="italic">[{alt || "image"}]</span>,
           a: ({ href, children }) => (
@@ -58,7 +70,7 @@ export default function Markdown({ children }: { children: string }) {
           ),
         }}
       >
-        {children}
+        {normalizeMath(children)}
       </ReactMarkdown>
     </div>
   );
