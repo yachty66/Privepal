@@ -313,20 +313,20 @@ export default function Home() {
   const sidebarContent = (
     <>
       <div className="flex items-center justify-between p-4">
-        <span className="flex items-center gap-2">
+        <span className="flex min-w-0 items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" className="h-6 w-6 rounded-md" />
-          <span className="text-lg font-semibold tracking-tight">
+          <img src="/logo.png" alt="" className="h-6 w-6 shrink-0 rounded-md" />
+          <span className="truncate text-lg font-semibold tracking-tight">
             Privepal
           </span>
-          <span className="rounded-full border border-neutral-700 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-neutral-400">
+          <span className="shrink-0 rounded-full border border-neutral-700 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-neutral-400">
             beta
           </span>
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex shrink-0 items-center gap-1">
           <button
             onClick={createChat}
-            className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
+            className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm whitespace-nowrap hover:bg-neutral-700"
           >
             + New
           </button>
