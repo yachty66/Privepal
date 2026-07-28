@@ -28,16 +28,13 @@ export const metadata: Metadata = {
       "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
     url: "https://privepal.com",
     siteName: "Privepal",
-    images: [{ url: "/logo.png", width: 256, height: 256 }],
-    locale: "de_DE",
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Privepal",
     description:
       "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
-    images: ["/logo.png"],
   },
 };
 
