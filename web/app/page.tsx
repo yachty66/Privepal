@@ -243,9 +243,6 @@ export default function Home() {
           <Link href="/privacy" className="hover:text-neutral-300">
             Datenschutz
           </Link>
-          <Link href="/imprint" className="hover:text-neutral-300">
-            Impressum
-          </Link>
         </p>
       </div>
     </>

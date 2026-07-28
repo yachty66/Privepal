@@ -24,9 +24,7 @@ export default function Privacy() {
             <h2 className="mb-1 font-medium text-neutral-100">
               1. Verantwortlicher
             </h2>
-            <p>
-              [VOLLSTÄNDIGER NAME], [ANSCHRIFT], E-Mail: support@privepal.com
-            </p>
+            <p>Kontakt: support@privepal.com</p>
           </section>
           <section>
             <h2 className="mb-1 font-medium text-neutral-100">
