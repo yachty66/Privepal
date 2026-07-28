@@ -17,6 +17,79 @@ interface VersionInfo {
 
 import { AUDIT_LINKS } from "@/lib/audit";
 
+function VerifySection({ commit }: { commit: string | null }) {
+  const short = commit?.slice(0, 12) ?? "<commit>";
+  return (
+    <div className="mt-10 rounded-xl border border-neutral-800 p-5">
+      <h2 className="text-[15px] font-medium text-neutral-100">
+        Verify this deployment yourself
+      </h2>
+      <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">
+        Four checks, increasing effort. Any mismatch means our claims are
+        broken; please report it.
+      </p>
+      <ol className="mt-4 space-y-3 text-sm text-neutral-400">
+        <li>
+          <span className="text-neutral-200">
+            1. Ask the server what it runs:
+          </span>
+          <pre className="mt-1 overflow-x-auto rounded-lg bg-neutral-950 p-3 font-mono text-[12px]">
+            curl -s https://privepal.com/api/version
+          </pre>
+        </li>
+        <li>
+          <span className="text-neutral-200">
+            2. Read exactly that code:
+          </span>{" "}
+          the response links to the commit on GitHub
+          {commit ? (
+            <>
+              {" "}
+              (currently{" "}
+              <a
+                href={`https://github.com/yachty66/Privepal/tree/${commit}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-neutral-300"
+              >
+                <code>{short}</code>
+              </a>
+              )
+            </>
+          ) : null}
+          .
+        </li>
+        <li>
+          <span className="text-neutral-200">
+            3. Confirm the pages you receive are stamped with the same commit:
+          </span>
+          <pre className="mt-1 overflow-x-auto rounded-lg bg-neutral-950 p-3 font-mono text-[12px]">
+            {`curl -s https://privepal.com | grep -oE '_next/static/[a-f0-9]{40}' | head -1`}
+          </pre>
+        </li>
+        <li>
+          <span className="text-neutral-200">
+            4. Rebuild the app from source and compare the served bundles:
+          </span>
+          <pre className="mt-1 overflow-x-auto rounded-lg bg-neutral-950 p-3 font-mono text-[12px]">
+            {`git clone https://github.com/yachty66/Privepal
+cd Privepal/web && git checkout ${short}
+npm ci && npm run build
+# compare .next/static/chunks with what privepal.com serves`}
+          </pre>
+        </li>
+      </ol>
+      <p className="mt-4 text-xs leading-relaxed text-neutral-500">
+        Honest limits: these checks catch any mismatch in the code your
+        browser runs. The server-side relay cannot be externally proven this
+        way; a deliberately malicious operator could misreport its own
+        version. Closing that gap requires hardware-attested serving, which
+        is on our roadmap, and is already how the AI inference itself runs.
+      </p>
+    </div>
+  );
+}
+
 function AuditSection() {
   return (
     <div className="mt-10 rounded-xl border border-neutral-800 p-5">
@@ -193,6 +266,8 @@ export default function Shield() {
             native app closes this gap completely.
           </Item>
         </div>
+
+        <VerifySection commit={version?.commit ?? null} />
 
         <AuditSection />
 

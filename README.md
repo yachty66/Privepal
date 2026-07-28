@@ -43,6 +43,32 @@ cp .env.example .env.local   # set PRIVATEMODE_API_KEY
 npm install && npm run dev
 ```
 
+## Verify the deployment
+
+Don't take "the site runs this code" on faith. Four checks, increasing effort:
+
+```bash
+# 1. Ask the server which commit it runs
+curl -s https://privepal.com/api/version
+
+# 2. Read exactly that code (the response links the commit on GitHub)
+
+# 3. Confirm the served pages are stamped with the same commit
+curl -s https://privepal.com | grep -oE '_next/static/[a-f0-9]{40}' | head -1
+
+# 4. Rebuild from source and compare the client bundles
+git clone https://github.com/yachty66/Privepal
+cd Privepal/web && git checkout <commit-from-step-1>
+npm ci && npm run build
+# compare .next/static/chunks with the files privepal.com serves
+```
+
+Honest limits: these checks catch any mismatch in the code your browser
+receives. The server-side relay cannot be externally proven this way; a
+deliberately malicious operator could misreport its version. Closing that
+gap requires hardware-attested serving (roadmap), which is already how the
+AI inference itself runs.
+
 ## Auditing
 
 Found something that contradicts a privacy claim? Please open an issue or
