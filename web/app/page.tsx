@@ -352,7 +352,7 @@ export default function Home() {
   );
 
   return (
-    <div className="flex h-dvh bg-black text-neutral-100">
+    <div className="flex h-dvh select-none bg-black text-neutral-100">
       {/* Sidebar (desktop) */}
       {desktopSidebar && (
         <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-800 sm:flex">
@@ -615,7 +615,7 @@ export default function Home() {
                   }`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
+                    className={`max-w-[85%] select-text rounded-2xl px-4 py-2.5 ${
                       m.role === "user"
                         ? "whitespace-pre-wrap bg-white text-[15px] leading-relaxed text-black"
                         : "bg-neutral-900 text-neutral-100"
