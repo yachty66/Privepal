@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { metrics } from "@/lib/metrics";
 
 // Streams chat completions from the Privatemode proxy (OpenAI-compatible).
 // The proxy handles attestation + encryption to the confidential-compute
@@ -40,6 +41,7 @@ function rateLimited(ip: string): boolean {
 }
 
 function badRequest(msg: string, status = 400) {
+  if (status === 400) metrics.invalidRequest();
   return new Response(JSON.stringify({ error: msg }), {
     status,
     headers: { "Content-Type": "application/json" },
@@ -57,6 +59,7 @@ export async function POST(req: NextRequest) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   if (rateLimited(ip)) {
+    metrics.rateLimited();
     return badRequest("rate limit exceeded, slow down", 429);
   }
 
@@ -93,6 +96,8 @@ export async function POST(req: NextRequest) {
   }
   if (total > MAX_TOTAL_CHARS) return badRequest("conversation too large");
 
+  metrics.chatRequest(model);
+  const upstreamStart = Date.now();
   const upstream = await fetch(`${PROXY_URL}/v1/chat/completions`, {
     method: "POST",
     headers: {
@@ -115,7 +120,10 @@ export async function POST(req: NextRequest) {
     signal: req.signal,
   });
 
+  metrics.upstreamHeaderMs(Date.now() - upstreamStart);
+
   if (!upstream.ok || !upstream.body) {
+    metrics.upstreamError();
     // never include upstream body: it can echo message content
     return new Response(
       JSON.stringify({ error: "upstream error", status: upstream.status }),

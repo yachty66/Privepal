@@ -5,7 +5,10 @@
 
 const PROXY_URL = process.env.PRIVATEMODE_PROXY_URL ?? "http://localhost:8080";
 
+import { metrics } from "@/lib/metrics";
+
 export async function GET() {
+  metrics.shieldCheck();
   let proxyOk = false;
   let models: string[] = [];
   try {
