@@ -187,6 +187,9 @@ export default function Home() {
           <span className="text-lg font-semibold tracking-tight">
             Privepal
           </span>
+          <span className="rounded-full border border-neutral-700 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-neutral-400">
+            beta
+          </span>
         </span>
         <button
           onClick={createChat}
@@ -475,11 +478,6 @@ export default function Home() {
                       )
                     ) : (
                       m.content
-                    )}
-                    {m.role === "assistant" && m.ttftMs !== undefined && (
-                      <div className="mt-1 text-[10px] text-neutral-500">
-                        first token {m.ttftMs}ms
-                      </div>
                     )}
                   </div>
                 </div>
