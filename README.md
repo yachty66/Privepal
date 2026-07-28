@@ -50,4 +50,4 @@ mail support@privepal.com. Breaking our claims is a contribution.
 
 ## License
 
-[AGPL-3.0](LICENSE). Run a modified Privepal, publish your changes.
+[AGPL-3.0](LICENSE). Run a modified Privepal, publish your changes. Deploys build directly from this repository; verify via privepal.com/api/version.
