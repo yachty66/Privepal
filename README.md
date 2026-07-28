@@ -54,7 +54,7 @@ curl -s https://privepal.com/api/version
 # 2. Read exactly that code (the response links the commit on GitHub)
 
 # 3. Confirm the served pages are stamped with the same commit
-curl -s https://privepal.com | grep -oE '_next/static/[a-f0-9]{40}' | head -1
+curl -s https://privepal.com | grep -o 'privepal-commit[^>]*'
 
 # 4. Rebuild from source and compare the client bundles
 git clone https://github.com/yachty66/Privepal

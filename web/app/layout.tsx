@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://privepal.com"),
+  // every served page declares the commit it was built from
+  other: {
+    "privepal-commit": process.env.RAILWAY_GIT_COMMIT_SHA ?? "dev",
+  },
   title: "Privepal",
   description:
     "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",

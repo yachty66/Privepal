@@ -64,7 +64,7 @@ function VerifySection({ commit }: { commit: string | null }) {
             3. Confirm the pages you receive are stamped with the same commit:
           </span>
           <pre className="mt-1 overflow-x-auto rounded-lg bg-neutral-950 p-3 font-mono text-[12px]">
-            {`curl -s https://privepal.com | grep -oE '_next/static/[a-f0-9]{40}' | head -1`}
+            {`curl -s https://privepal.com | grep -o 'privepal-commit[^>]*'`}
           </pre>
         </li>
         <li>
