@@ -306,6 +306,22 @@ export default function Home() {
               </button>
             ))}
           </div>
+          <div className="flex items-center gap-3">
+          <span className="hidden items-center gap-1 rounded-full border border-neutral-800 px-2 py-0.5 text-[10px] uppercase tracking-wider text-neutral-500 sm:flex">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3 w-3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="6" y="2" width="12" height="20" rx="2.5" />
+              <path d="M11 18h2" />
+            </svg>
+            iOS soon
+          </span>
           <Link
             href="/shield"
             className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-200"
@@ -324,6 +340,7 @@ export default function Home() {
             </svg>
             confidential
           </Link>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto">
