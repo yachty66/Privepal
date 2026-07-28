@@ -10,22 +10,7 @@ interface ShieldStatus {
   checkedAt: number;
 }
 
-const AUDIT_PROMPT = `Please review the code at https://github.com/yachty66/Privepal (the web/ directory is the live web app). The app claims: chat history is stored only client-side in the browser, there is no tracking and no analytics scripts, no third-party network connections can load (CSP), and messages are relayed to confidential-compute inference without being logged or stored. Check the code critically: are these claims true? Look for logging of message content, analytics, data exfiltration, or anything contradicting the privacy claims, and give an honest verdict.`;
-
-const AUDIT_LINKS = [
-  {
-    name: "Ask Claude",
-    href: `https://claude.ai/new?q=${encodeURIComponent(AUDIT_PROMPT)}`,
-  },
-  {
-    name: "Ask ChatGPT",
-    href: `https://chatgpt.com/?q=${encodeURIComponent(AUDIT_PROMPT)}`,
-  },
-  {
-    name: "Ask Perplexity",
-    href: `https://www.perplexity.ai/search?q=${encodeURIComponent(AUDIT_PROMPT)}`,
-  },
-];
+import { AUDIT_LINKS } from "@/lib/audit";
 
 function AuditSection() {
   return (
@@ -48,7 +33,7 @@ function AuditSection() {
             rel="noopener noreferrer"
             className="rounded-lg border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-400 hover:text-white"
           >
-            {l.name} &rarr;
+            Ask {l.name} &rarr;
           </a>
         ))}
       </div>

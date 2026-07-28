@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Chat, Message, loadChats, newChat, saveChats } from "@/lib/store";
 import { streamChat } from "@/lib/sse";
 import Markdown from "@/components/Markdown";
+import { AUDIT_LINKS } from "@/lib/audit";
 
 const MODELS = [
   { id: "gpt-oss-120b", label: "Fast" },
@@ -452,6 +453,24 @@ export default function Home() {
                     </div>
                   )}
                 </Link>
+                {verifyStep === 3 && (
+                  <div className="animate-pop-in mt-4 text-xs text-neutral-500">
+                    Open source. Don&apos;t trust us? Audit the code with{" "}
+                    {AUDIT_LINKS.map((l, i) => (
+                      <span key={l.name}>
+                        <a
+                          href={l.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline decoration-neutral-600 underline-offset-2 hover:text-neutral-300"
+                        >
+                          {l.name}
+                        </a>
+                        {i < AUDIT_LINKS.length - 1 ? " · " : ""}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               active.messages.map((m, i) => (
