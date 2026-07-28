@@ -25,7 +25,7 @@ export default function Privacy() {
               1. Verantwortlicher
             </h2>
             <p>
-              [VOLLSTÄNDIGER NAME], [ANSCHRIFT], E-Mail: [KONTAKT-EMAIL]
+              [VOLLSTÄNDIGER NAME], [ANSCHRIFT], E-Mail: support@privepal.com
             </p>
           </section>
           <section>

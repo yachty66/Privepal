@@ -32,7 +32,7 @@ export default function Imprint() {
           <p>
             Kontakt:
             <br />
-            E-Mail: [KONTAKT-EMAIL]
+            E-Mail: support@privepal.com
           </p>
           <p>
             Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:
