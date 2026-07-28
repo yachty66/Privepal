@@ -87,7 +87,10 @@ export default function Home() {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const loaded = loadChats();
+    const raw = loadChats();
+    // drop empty chats left over from repeated "+ New" clicks
+    const loaded = raw.filter((c) => c.messages.length > 0);
+    if (loaded.length !== raw.length) saveChats(loaded);
     setChats(loaded);
     if (loaded.length > 0) setActiveId(loaded[0].id);
     // each step completes on a real network event, with a minimum display
@@ -125,9 +128,15 @@ export default function Home() {
   }, [active?.messages.length, busy]);
 
   function createChat() {
-    const c = newChat(model);
-    persist([c, ...chats]);
-    setActiveId(c.id);
+    // reuse an existing empty chat instead of stacking up "New chat" entries
+    const empty = chats.find((c) => c.messages.length === 0);
+    if (empty) {
+      setActiveId(empty.id);
+    } else {
+      const c = newChat(model);
+      persist([c, ...chats]);
+      setActiveId(c.id);
+    }
     setSidebarOpen(false);
   }
 
