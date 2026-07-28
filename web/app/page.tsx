@@ -300,7 +300,7 @@ export default function Home() {
             Security
           </Link>
           <Link href="/privacy" className="hover:text-neutral-300">
-            Datenschutz
+            Privacy
           </Link>
         </p>
       </div>

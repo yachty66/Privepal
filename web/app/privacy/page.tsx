@@ -1,10 +1,9 @@
 import Link from "next/link";
 
-export const metadata = { title: "Datenschutz | Privepal" };
+export const metadata = { title: "Privacy | Privepal" };
 
-// TODO(max): fill in name/address/email (same as Impressum) and have this
-// reviewed before scaling. Written to be honest and match the actual
-// architecture: no accounts, no tracking, no server-side chat storage.
+// Written to be honest and match the actual architecture: no accounts,
+// no tracking, no server-side chat storage.
 
 export default function Privacy() {
   return (
@@ -17,69 +16,67 @@ export default function Privacy() {
           &larr; back to chat
         </Link>
         <h1 className="mt-8 text-2xl font-semibold tracking-tight">
-          Datenschutzerklärung
+          Privacy Policy
         </h1>
         <div className="mt-6 space-y-5 text-sm leading-relaxed text-neutral-300">
           <section>
-            <h2 className="mb-1 font-medium text-neutral-100">
-              1. Verantwortlicher
-            </h2>
-            <p>Kontakt: support@privepal.com</p>
+            <h2 className="mb-1 font-medium text-neutral-100">1. Contact</h2>
+            <p>support@privepal.com</p>
           </section>
           <section>
             <h2 className="mb-1 font-medium text-neutral-100">
-              2. Das Wichtigste zuerst
+              2. The most important part first
             </h2>
             <p>
-              Privepal ist so gebaut, dass wir möglichst wenig über Sie wissen.
-              Es gibt keine Konten, keine Cookies zu Werbe- oder
-              Analysezwecken, keine Tracker und keine serverseitige Speicherung
-              Ihrer Unterhaltungen.
+              Privepal is built so that we know as little about you as
+              possible. There are no accounts, no advertising or analytics
+              cookies, no trackers, and no server-side storage of your
+              conversations.
             </p>
           </section>
           <section>
             <h2 className="mb-1 font-medium text-neutral-100">
-              3. Ihre Chat-Inhalte
+              3. Your chat content
             </h2>
             <p>
-              Ihre Unterhaltungen werden ausschließlich lokal in Ihrem Browser
-              gespeichert (localStorage). Zur Erzeugung einer Antwort wird Ihre
-              Nachricht über unseren Server an die Privatemode-API der Edgeless
-              Systems GmbH (Bochum, Deutschland) übermittelt und dort in einer
-              versiegelten Confidential-Computing-Umgebung verarbeitet, die
-              weder Edgeless Systems noch deren Rechenzentrumsbetreiber
-              einsehen können. Weder wir noch Edgeless Systems speichern
-              Chat-Inhalte oder verwenden sie zum Training von KI-Modellen.
-              Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO
-              (Vertragserfüllung).
+              Your conversations are stored exclusively in your browser
+              (localStorage). To generate a response, your message is relayed
+              through our server to the Privatemode API of Edgeless Systems
+              GmbH (Bochum, Germany), where it is processed inside a sealed
+              confidential-computing environment that neither Edgeless
+              Systems nor their datacenter operator can look into. Neither we
+              nor Edgeless Systems store chat content or use it to train AI
+              models. Legal basis: Art. 6(1)(b) GDPR (performance of the
+              service).
             </p>
           </section>
           <section>
             <h2 className="mb-1 font-medium text-neutral-100">
-              4. Technische Zugriffsdaten
+              4. Technical access data
             </h2>
             <p>
-              Beim Aufruf der Seite verarbeitet unser Hosting-Anbieter Railway
-              Corp. (USA) technisch notwendige Verbindungsdaten (z. B.
-              IP-Adresse, Zeitpunkt des Zugriffs) zur Auslieferung der Seite
-              und zur Abwehr von Missbrauch. Wir selbst verarbeiten
-              IP-Adressen flüchtig im Arbeitsspeicher zur Begrenzung der
-              Anfragerate; sie werden nicht dauerhaft gespeichert.
-              Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes
-              Interesse an Betrieb und Sicherheit). Mit Railway besteht ein
-              Auftragsverarbeitungsvertrag auf Basis der
-              EU-Standardvertragsklauseln.
+              When you visit the site, our hosting provider Railway Corp.
+              (USA) processes technically necessary connection data (such as
+              IP address and time of access) to deliver the site and defend
+              against abuse. We ourselves process IP addresses transiently in
+              memory to rate-limit requests; they are never stored
+              permanently. Legal basis: Art. 6(1)(f) GDPR (legitimate
+              interest in operating and securing the service). A data
+              processing agreement based on the EU Standard Contractual
+              Clauses is in place with Railway.
             </p>
           </section>
           <section>
-            <h2 className="mb-1 font-medium text-neutral-100">5. Ihre Rechte</h2>
+            <h2 className="mb-1 font-medium text-neutral-100">
+              5. Your rights
+            </h2>
             <p>
-              Sie haben nach der DSGVO Rechte auf Auskunft, Berichtigung,
-              Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit
-              und Widerspruch sowie ein Beschwerderecht bei einer
-              Datenschutzaufsichtsbehörde. Da wir keine Inhalte über Sie
-              speichern, gibt es in aller Regel schlicht nichts, worüber wir
-              Auskunft geben könnten: Ihre Chats liegen nur bei Ihnen.
+              Under the GDPR you have the right to access, rectification,
+              erasure, restriction of processing, data portability, and
+              objection, as well as the right to lodge a complaint with a
+              supervisory authority. Since we store no content about you,
+              there is usually simply nothing for us to disclose: your chats
+              live only with you.
             </p>
           </section>
         </div>
