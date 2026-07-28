@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Chat, Message, loadChats, newChat, saveChats } from "@/lib/store";
+import {
+  Chat,
+  Message,
+  loadChats,
+  newChat,
+  newSlug,
+  saveChats,
+} from "@/lib/store";
 import { streamChat } from "@/lib/sse";
 import Markdown from "@/components/Markdown";
 import { AUDIT_LINKS } from "@/lib/audit";
@@ -80,6 +87,7 @@ export default function Home() {
   const [model, setModel] = useState<string>("gpt-oss-120b");
   const [busy, setBusy] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [desktopSidebar, setDesktopSidebar] = useState(true);
   const [thinking, setThinking] = useState(false);
   const [channelOk, setChannelOk] = useState<boolean | null>(null);
@@ -89,11 +97,25 @@ export default function Home() {
 
   useEffect(() => {
     const raw = loadChats();
-    // drop empty chats left over from repeated "+ New" clicks
-    const loaded = raw.filter((c) => c.messages.length > 0);
-    if (loaded.length !== raw.length) saveChats(loaded);
+    // drop empty chats left over from repeated "+ New" clicks, and give
+    // chats saved by older versions a link slug
+    let migrated = false;
+    const loaded = raw
+      .filter((c) => c.messages.length > 0)
+      .map((c) => {
+        if (c.slug) return c;
+        migrated = true;
+        return { ...c, slug: newSlug() };
+      });
+    if (migrated || loaded.length !== raw.length) saveChats(loaded);
     setChats(loaded);
-    if (loaded.length > 0) setActiveId(loaded[0].id);
+    // /c/<slug> opens that chat if it exists on this device
+    const m = window.location.pathname.match(/^\/c\/([^/]+)$/);
+    const fromUrl = m
+      ? loaded.find((c) => c.slug === decodeURIComponent(m[1]))
+      : undefined;
+    if (fromUrl) setActiveId(fromUrl.id);
+    else if (loaded.length > 0) setActiveId(loaded[0].id);
     // each step completes on a real network event, with a minimum display
     // time so the sequence stays readable on fast connections
     const minStep = (ms: number) =>
@@ -118,6 +140,14 @@ export default function Home() {
   }, []);
 
   const active = chats.find((c) => c.id === activeId) ?? null;
+
+  // mirror the active chat in the address bar as a local-only link
+  useEffect(() => {
+    const path = active?.slug ? `/c/${active.slug}` : "/";
+    if (window.location.pathname !== path) {
+      window.history.replaceState(null, "", path);
+    }
+  }, [active?.slug]);
 
   const persist = useCallback((next: Chat[]) => {
     setChats(next);
@@ -254,6 +284,32 @@ export default function Home() {
     abortRef.current?.abort();
   }
 
+  // client-side search across titles and full message content; nothing
+  // ever leaves the device
+  const query = search.trim().toLowerCase();
+  const visibleChats = query
+    ? chats.filter(
+        (c) =>
+          c.title.toLowerCase().includes(query) ||
+          c.messages.some((m) => m.content.toLowerCase().includes(query))
+      )
+    : chats;
+
+  function snippet(c: Chat): string | null {
+    if (!query) return null;
+    const m = c.messages.find((m) =>
+      m.content.toLowerCase().includes(query)
+    );
+    if (!m) return null;
+    const i = m.content.toLowerCase().indexOf(query);
+    const start = Math.max(0, i - 24);
+    return (
+      (start > 0 ? "..." : "") +
+      m.content.slice(start, i + query.length + 40) +
+      (i + query.length + 40 < m.content.length ? "..." : "")
+    );
+  }
+
   const sidebarContent = (
     <>
       <div className="flex items-center justify-between p-4">
@@ -298,8 +354,20 @@ export default function Home() {
           </button>
         </span>
       </div>
+      <div className="px-4 pb-2">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search chats"
+          className="w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+        />
+      </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2">
-        {chats.map((c) => (
+        {query && visibleChats.length === 0 && (
+          <p className="px-3 py-2 text-xs text-neutral-600">No matches</p>
+        )}
+        {visibleChats.map((c) => (
           <div
             key={c.id}
             className={`group flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm ${
@@ -310,7 +378,14 @@ export default function Home() {
               setSidebarOpen(false);
             }}
           >
-            <span className="truncate">{c.title}</span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate">{c.title}</span>
+              {snippet(c) && (
+                <span className="block truncate text-xs text-neutral-500">
+                  {snippet(c)}
+                </span>
+              )}
+            </span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
