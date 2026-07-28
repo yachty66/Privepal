@@ -1,4 +1,4 @@
-import Link from "next/link";
+import BackLink from "@/components/BackLink";
 
 export const metadata = { title: "Privacy | Privepal" };
 
@@ -9,12 +9,7 @@ export default function Privacy() {
   return (
     <div className="min-h-dvh bg-black text-neutral-100">
       <div className="mx-auto max-w-2xl px-4 py-10">
-        <Link
-          href="/"
-          className="text-sm text-neutral-500 hover:text-neutral-300"
-        >
-          &larr; back to chat
-        </Link>
+        <BackLink />
         <h1 className="mt-8 text-2xl font-semibold tracking-tight">
           Privacy Policy
         </h1>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { loadChats } from "@/lib/store";
 
 interface ShieldStatus {
@@ -216,12 +216,7 @@ export default function Shield() {
   return (
     <div className="min-h-dvh bg-black text-neutral-100">
       <div className="mx-auto max-w-2xl px-4 py-10">
-        <Link
-          href="/"
-          className="text-sm text-neutral-500 hover:text-neutral-300"
-        >
-          &larr; back to chat
-        </Link>
+        <BackLink />
 
         <div className="mt-8 mb-2 flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
