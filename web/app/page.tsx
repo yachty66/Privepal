@@ -522,8 +522,19 @@ export default function Home() {
                           </span>
                         </div>
                       </div>
-                      <div className="mt-3 text-xs text-neutral-500">
-                        See what is proven vs. what you take on trust &rarr;
+                      <div className="mt-3 flex items-center gap-1 text-xs text-neutral-500">
+                        See what is proven vs. what you take on trust
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="h-3 w-3"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M9 18l6-6-6-6" />
+                        </svg>
                       </div>
                     </div>
                   )}

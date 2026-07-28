@@ -137,9 +137,20 @@ function AuditSection() {
             href={l.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-lg border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-400 hover:text-white"
+            className="flex items-center gap-1.5 rounded-lg border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-400 hover:text-white"
           >
-            Ask {l.name} &rarr;
+            Ask {l.name}
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
           </a>
         ))}
         <CopyAuditPackage />
