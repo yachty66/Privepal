@@ -141,6 +141,13 @@ export default function Home() {
   }
 
   function deleteChat(id: string) {
+    const chat = chats.find((c) => c.id === id);
+    if (
+      !confirm(
+        `Delete "${chat?.title ?? "this chat"}"? This cannot be undone.`
+      )
+    )
+      return;
     const next = chats.filter((c) => c.id !== id);
     persist(next);
     if (activeId === id) setActiveId(next[0]?.id ?? null);
