@@ -10,6 +10,52 @@ interface ShieldStatus {
   checkedAt: number;
 }
 
+const AUDIT_PROMPT = `Please review the code at https://github.com/yachty66/Privepal (the web/ directory is the live web app). The app claims: chat history is stored only client-side in the browser, there is no tracking and no analytics scripts, no third-party network connections can load (CSP), and messages are relayed to confidential-compute inference without being logged or stored. Check the code critically: are these claims true? Look for logging of message content, analytics, data exfiltration, or anything contradicting the privacy claims, and give an honest verdict.`;
+
+const AUDIT_LINKS = [
+  {
+    name: "Ask Claude",
+    href: `https://claude.ai/new?q=${encodeURIComponent(AUDIT_PROMPT)}`,
+  },
+  {
+    name: "Ask ChatGPT",
+    href: `https://chatgpt.com/?q=${encodeURIComponent(AUDIT_PROMPT)}`,
+  },
+  {
+    name: "Ask Perplexity",
+    href: `https://www.perplexity.ai/search?q=${encodeURIComponent(AUDIT_PROMPT)}`,
+  },
+];
+
+function AuditSection() {
+  return (
+    <div className="mt-10 rounded-xl border border-neutral-800 p-5">
+      <h2 className="text-[15px] font-medium text-neutral-100">
+        Don&apos;t take our word for it
+      </h2>
+      <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">
+        Our code is open source. One click sends it to an AI you already
+        trust, with the question: is this really as private as they claim?
+        It&apos;s a second opinion, not a formal proof, but it&apos;s a second
+        opinion we can&apos;t influence.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {AUDIT_LINKS.map((l) => (
+          <a
+            key={l.name}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-400 hover:text-white"
+          >
+            {l.name} &rarr;
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Item({
   state,
   title,
@@ -127,6 +173,8 @@ export default function Shield() {
             native app closes this gap completely.
           </Item>
         </div>
+
+        <AuditSection />
 
         <p className="mt-8 text-xs leading-relaxed text-neutral-600">
           Want to check the deep claims yourself? Privatemode&apos;s
