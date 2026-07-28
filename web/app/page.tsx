@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Chat, Message, loadChats, newChat, saveChats } from "@/lib/store";
 import { streamChat } from "@/lib/sse";
+import Markdown from "@/components/Markdown";
 
 const MODELS = [
   { id: "gpt-oss-120b", label: "Fast" },
@@ -461,14 +462,23 @@ export default function Home() {
                   }`}
                 >
                   <div
-                    className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed ${
+                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                       m.role === "user"
-                        ? "bg-white text-black"
+                        ? "whitespace-pre-wrap bg-white text-[15px] leading-relaxed text-black"
                         : "bg-neutral-900 text-neutral-100"
                     }`}
                   >
-                    {m.content ||
-                      (busy && i === active.messages.length - 1 ? "..." : "")}
+                    {m.role === "assistant" ? (
+                      m.content ? (
+                        <Markdown>{m.content}</Markdown>
+                      ) : busy && i === active.messages.length - 1 ? (
+                        "..."
+                      ) : (
+                        ""
+                      )
+                    ) : (
+                      m.content
+                    )}
                     {m.role === "assistant" && m.ttftMs !== undefined && (
                       <div className="mt-1 text-[10px] text-neutral-500">
                         first token {m.ttftMs}ms
