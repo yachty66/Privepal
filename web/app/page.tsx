@@ -404,16 +404,16 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-2xl px-4 py-6">
             {!active || active.messages.length === 0 ? (
-              <div className="mt-10 flex flex-col items-center text-center text-neutral-500 sm:mt-24">
+              <div className="mt-3 flex flex-col items-center text-center text-neutral-500 sm:mt-24">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/logo.png"
                   alt="Privepal"
-                  className={`mb-6 h-20 w-20 ${
+                  className={`mb-4 h-14 w-14 sm:mb-6 sm:h-20 sm:w-20 ${
                     verifyStep < 3 ? "animate-pulse" : ""
                   }`}
                 />
-                <p className="text-2xl font-medium text-neutral-300">
+                <p className="text-xl font-medium text-neutral-300 sm:text-2xl">
                   Fast. Private. Yours.
                 </p>
                 <p className="mt-2 text-sm">
@@ -421,11 +421,11 @@ export default function Home() {
                 </p>
                 <Link
                   href="/shield"
-                  className="mt-8 block w-full max-w-md rounded-xl border border-neutral-800 p-4 text-left transition-colors hover:border-neutral-600"
+                  className="mt-5 block w-full max-w-md rounded-xl border border-neutral-800 p-4 sm:mt-8 text-left transition-colors hover:border-neutral-600"
                 >
                   <div className="flex flex-col items-center">
-                    <div className="relative h-24 w-24">
-                      <svg viewBox="0 0 100 100" className="h-24 w-24 -rotate-90">
+                    <div className="relative h-16 w-16 sm:h-24 sm:w-24">
+                      <svg viewBox="0 0 100 100" className="h-16 w-16 -rotate-90 sm:h-24 sm:w-24">
                         {/* track */}
                         <circle
                           cx="50"
@@ -461,7 +461,7 @@ export default function Home() {
                       {verifyStep === 3 && channelOk && (
                         <svg
                           viewBox="0 0 24 24"
-                          className="absolute inset-0 m-auto h-10 w-10 text-green-500"
+                          className="absolute inset-0 m-auto h-7 w-7 text-green-500 sm:h-10 sm:w-10"
                           fill="none"
                           stroke="currentColor"
                           strokeWidth="2.5"
