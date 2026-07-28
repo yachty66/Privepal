@@ -90,25 +90,28 @@ export default function Home() {
     const loaded = loadChats();
     setChats(loaded);
     if (loaded.length > 0) setActiveId(loaded[0].id);
-    fetch("/api/shield")
-      .then((r) => r.json())
-      .then((s) => setChannelOk(!!s.proxyOk))
-      .catch(() => setChannelOk(false));
-    const t1 = setTimeout(() => setVerifyStep(1), 900);
-    const t2 = setTimeout(() => setVerifyStep(2), 2000);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    // each step completes on a real network event, with a minimum display
+    // time so the sequence stays readable on fast connections
+    const minStep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    (async () => {
+      // step 1: reach our server and learn which commit it runs
+      const reach = fetch("/api/version").then((r) => r.ok);
+      await Promise.all([reach.catch(() => false), minStep(700)]);
+      setVerifyStep(1);
+      // step 2: confirm the proxy's attested channel to the enclave is live
+      const shield = fetch("/api/shield")
+        .then((r) => r.json())
+        .then((s) => !!s.proxyOk)
+        .catch(() => false);
+      const [ok] = await Promise.all([shield, minStep(900)]);
+      setVerifyStep(2);
+      // step 3: lock in the result
+      await minStep(700);
+      setChannelOk(ok);
+      setVerifyStep(3);
+    })();
   }, []);
-
-  // final step completes only once the real check has answered
-  useEffect(() => {
-    if (verifyStep === 2 && channelOk !== null) {
-      const t = setTimeout(() => setVerifyStep(3), 900);
-      return () => clearTimeout(t);
-    }
-  }, [verifyStep, channelOk]);
 
   const active = chats.find((c) => c.id === activeId) ?? null;
 
