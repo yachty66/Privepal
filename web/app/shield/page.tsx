@@ -15,7 +15,35 @@ interface VersionInfo {
   source: string | null;
 }
 
-import { AUDIT_LINKS } from "@/lib/audit";
+import { AUDIT_LINKS, AUDIT_PROMPT } from "@/lib/audit";
+
+function CopyAuditPackage() {
+  const [state, setState] = useState<"idle" | "copied" | "error">("idle");
+  return (
+    <button
+      onClick={async () => {
+        try {
+          const res = await fetch("/audit-bundle.txt");
+          const bundle = await res.text();
+          await navigator.clipboard.writeText(
+            `${AUDIT_PROMPT}\n\nHere is the bundle content:\n\n${bundle}`
+          );
+          setState("copied");
+        } catch {
+          setState("error");
+        }
+        setTimeout(() => setState("idle"), 2000);
+      }}
+      className="rounded-lg border border-neutral-700 px-3.5 py-2 text-sm text-neutral-200 hover:border-neutral-400 hover:text-white"
+    >
+      {state === "copied"
+        ? "Copied, paste into any AI"
+        : state === "error"
+          ? "Copy failed, open /audit-bundle.txt"
+          : "Copy audit package"}
+    </button>
+  );
+}
 
 function VerifySection({ commit }: { commit: string | null }) {
   const short = commit?.slice(0, 12) ?? "<commit>";
@@ -114,7 +142,20 @@ function AuditSection() {
             Ask {l.name} &rarr;
           </a>
         ))}
+        <CopyAuditPackage />
       </div>
+      <p className="mt-3 text-xs text-neutral-500">
+        If the AI can&apos;t fetch URLs, use &quot;Copy audit package&quot;: it
+        puts the question plus the complete source of the privacy-critical
+        files in your clipboard, ready to paste into any AI. Raw bundle:{" "}
+        <a
+          href="/audit-bundle.txt"
+          target="_blank"
+          className="underline hover:text-neutral-400"
+        >
+          /audit-bundle.txt
+        </a>
+      </p>
     </div>
   );
 }

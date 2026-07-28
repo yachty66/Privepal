@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prebuild": "node scripts/build-audit-bundle.mjs"
   },
   "dependencies": {
     "katex": "^0.18.1",
