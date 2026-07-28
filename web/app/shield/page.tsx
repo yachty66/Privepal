@@ -10,6 +10,11 @@ interface ShieldStatus {
   checkedAt: number;
 }
 
+interface VersionInfo {
+  commit: string | null;
+  source: string | null;
+}
+
 import { AUDIT_LINKS } from "@/lib/audit";
 
 function AuditSection() {
@@ -76,6 +81,7 @@ export default function Shield() {
   const [failed, setFailed] = useState(false);
   const [chatCount, setChatCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
+  const [version, setVersion] = useState<VersionInfo | null>(null);
 
   useEffect(() => {
     const chats = loadChats();
@@ -85,6 +91,10 @@ export default function Shield() {
       .then((r) => r.json())
       .then(setStatus)
       .catch(() => setFailed(true));
+    fetch("/api/version")
+      .then((r) => r.json())
+      .then(setVersion)
+      .catch(() => {});
   }, []);
 
   const checking = !status && !failed;
@@ -147,6 +157,31 @@ export default function Shield() {
           <Item state="design" title="No account, no tracking">
             No sign-up, no cookies for tracking, no analytics scripts on the
             chat. There is nothing to link your conversations to you.
+          </Item>
+
+          <Item
+            state={version?.commit ? "verified" : "trust"}
+            title="This deployment matches the public code"
+          >
+            {version?.commit ? (
+              <>
+                This server was built by our host directly from the public
+                repository, commit{" "}
+                <a
+                  href={version.source ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-neutral-300"
+                >
+                  <code>{version.commit.slice(0, 12)}</code>
+                </a>
+                . Read exactly that code on GitHub. (You still trust the host
+                to build honestly; hardware-attested serving is on the
+                roadmap.)
+              </>
+            ) : (
+              "Deploy provenance is being set up: soon this will show the exact public commit this server was built from."
+            )}
           </Item>
 
           <Item state="trust" title="Our relay server">

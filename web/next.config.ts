@@ -26,6 +26,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // tie the build id (and thus asset hashes) to the exact git commit
+  generateBuildId: async () =>
+    process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
