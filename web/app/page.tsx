@@ -80,6 +80,7 @@ export default function Home() {
   const [model, setModel] = useState<string>("gpt-oss-120b");
   const [busy, setBusy] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebar, setDesktopSidebar] = useState(true);
   const [thinking, setThinking] = useState(false);
   const [channelOk, setChannelOk] = useState<boolean | null>(null);
   const [verifyStep, setVerifyStep] = useState(0);
@@ -266,12 +267,36 @@ export default function Home() {
             beta
           </span>
         </span>
-        <button
-          onClick={createChat}
-          className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
-        >
-          + New
-        </button>
+        <span className="flex items-center gap-1">
+          <button
+            onClick={createChat}
+            className="rounded-md bg-neutral-800 px-2.5 py-1 text-sm hover:bg-neutral-700"
+          >
+            + New
+          </button>
+          <button
+            onClick={() => {
+              setDesktopSidebar(false);
+              setSidebarOpen(false);
+            }}
+            aria-label="Hide sidebar"
+            title="Hide sidebar"
+            className="rounded-md p-1 text-neutral-500 hover:bg-neutral-900 hover:text-neutral-200"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M9 4v16" />
+            </svg>
+          </button>
+        </span>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2">
         {chats.map((c) => (
@@ -329,9 +354,11 @@ export default function Home() {
   return (
     <div className="flex h-dvh bg-black text-neutral-100">
       {/* Sidebar (desktop) */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-800 sm:flex">
-        {sidebarContent}
-      </aside>
+      {desktopSidebar && (
+        <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-800 sm:flex">
+          {sidebarContent}
+        </aside>
+      )}
 
       {/* Sidebar (mobile drawer) */}
       {sidebarOpen && (
@@ -350,9 +377,14 @@ export default function Home() {
       <main className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-neutral-800 px-4 py-3">
           <button
-            onClick={() => setSidebarOpen(true)}
+            onClick={() => {
+              setSidebarOpen(true);
+              setDesktopSidebar(true);
+            }}
             aria-label="Open chats"
-            className="-ml-1 p-1 text-neutral-400 hover:text-neutral-200 sm:hidden"
+            className={`-ml-1 p-1 text-neutral-400 hover:text-neutral-200 ${
+              desktopSidebar ? "sm:hidden" : ""
+            }`}
           >
             <svg
               viewBox="0 0 24 24"
