@@ -49,11 +49,11 @@ struct VerifyRingView: View {
             if !done {
                 VStack(spacing: 4) {
                     Text("VERIFYING PRIVATE CHANNEL")
-                        .font(.system(size: 10, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                         .tracking(2)
                         .foregroundStyle(Color(white: 0.4))
                     Text(steps[min(step, 2)] + "...")
-                        .font(.system(size: 13, design: .monospaced))
+                        .font(.system(size: 14))
                         .foregroundStyle(Color(white: 0.7))
                 }
             } else {
@@ -79,7 +79,7 @@ struct VerifyRingView: View {
                 .fill(ok ? .white : Color(white: 0.3))
                 .frame(width: 7, height: 7)
             Text(text)
-                .font(.system(size: 13, design: .monospaced))
+                .font(.system(size: 14))
                 .foregroundStyle(Color(white: 0.7))
         }
     }

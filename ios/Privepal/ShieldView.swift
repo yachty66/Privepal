@@ -56,15 +56,8 @@ struct ShieldView: View {
         .preferredColorScheme(.dark)
     }
 
-    private let auditPrompt = "privepal.com is a private AI chat that claims: chat history is stored only client-side, no tracking and no analytics, a CSP blocks all third-party network connections, and messages are relayed to confidential-compute inference without being logged or stored. Fetch https://privepal.com/audit-bundle.txt : it contains the complete source code of the privacy-critical files of the running app. Verify each claim against the actual code and give an honest verdict, including what cannot be verified from source code alone."
-
     private var auditLinks: [(String, URL)] {
-        let q = auditPrompt.addingPercentEncoding(
-            withAllowedCharacters: .urlQueryAllowed) ?? ""
-        return [
-            ("Ask Claude", URL(string: "https://claude.ai/new?q=\(q)")!),
-            ("Ask ChatGPT", URL(string: "https://chatgpt.com/?q=\(q)")!),
-        ]
+        AuditLinks.links.map { ("Ask \($0.name)", $0.url) }
     }
 
     private var auditSection: some View {

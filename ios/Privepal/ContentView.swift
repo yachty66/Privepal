@@ -17,35 +17,39 @@ struct ContentView: View {
                     Image(systemName: "line.3.horizontal")
                         .font(.system(size: 18))
                         .foregroundStyle(.white)
-                        .frame(width: 44, height: 44)
-                        .glassEffect(.regular.interactive(), in: .circle)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(Color(white: 0.09)))
                 }
 
                 Spacer()
 
                 // Model toggle
-                HStack(spacing: 2) {
+                HStack(spacing: 4) {
                     ForEach(AIModel.allCases) { m in
                         Button {
                             viewModel.model = m
                         } label: {
                             Text(m.label)
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 14))
                                 .foregroundStyle(
-                                    viewModel.model == m ? .black : .white
+                                    viewModel.model == m
+                                        ? .white : Color(white: 0.6)
                                 )
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 16)
+                                .padding(.vertical, 6)
+                                .padding(.horizontal, 14)
                                 .background(
-                                    Capsule().fill(
-                                        viewModel.model == m ? .white : .clear
-                                    )
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(viewModel.model == m
+                                            ? Color(white: 0.28) : .clear)
                                 )
                         }
                     }
                 }
-                .padding(3)
-                .glassEffect(.regular, in: .capsule)
+                .padding(4)
+                .background(
+                    RoundedRectangle(cornerRadius: 11)
+                        .fill(Color(white: 0.09))
+                )
 
                 Spacer()
 
@@ -57,8 +61,8 @@ struct ContentView: View {
                         .foregroundStyle(
                             viewModel.ready ? .green : .white
                         )
-                        .frame(width: 44, height: 44)
-                        .glassEffect(.regular.interactive(), in: .circle)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(Color(white: 0.09)))
                 }
             }
             .padding(.horizontal)
@@ -81,12 +85,7 @@ struct ContentView: View {
                                     if viewModel.isThinking {
                                         HStack {
                                             Text("thinking...")
-                                                .font(
-                                                    .system(
-                                                        size: 13,
-                                                        design: .monospaced
-                                                    )
-                                                )
+                                                .font(.system(size: 14))
                                                 .foregroundStyle(
                                                     Color(white: 0.4)
                                                 )
@@ -119,11 +118,53 @@ struct ContentView: View {
                                         .font(.system(size: 13))
                                         .foregroundStyle(Color(white: 0.45))
                                     }
-                                    VerifyRingView(
-                                        step: viewModel.verifyStep,
-                                        channelOk: viewModel.channelOk
+                                    // web-style bordered verification card
+                                    VStack(spacing: 14) {
+                                        VerifyRingView(
+                                            step: viewModel.verifyStep,
+                                            channelOk: viewModel.channelOk
+                                        )
+                                        if viewModel.verifyStep == 3 {
+                                            HStack(spacing: 4) {
+                                                Text("See what is proven vs. what you take on trust")
+                                                Image(systemName: "chevron.right")
+                                                    .font(.system(size: 9, weight: .bold))
+                                            }
+                                            .font(.system(size: 12))
+                                            .foregroundStyle(Color(white: 0.45))
+                                        }
+                                    }
+                                    .padding(20)
+                                    .frame(maxWidth: 360)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .fill(Color(white: 0.04))
                                     )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .stroke(Color(white: 0.16), lineWidth: 1)
+                                    )
+                                    .onTapGesture { showShield = true }
                                     .padding(.top, 4)
+
+                                    if viewModel.verifyStep == 3 {
+                                        HStack(spacing: 5) {
+                                            Text("Open source. Don't trust us? Audit the code with")
+                                                .foregroundStyle(Color(white: 0.45))
+                                            ForEach(
+                                                Array(AuditLinks.links.enumerated()),
+                                                id: \.offset
+                                            ) { i, link in
+                                                Link(link.name, destination: link.url)
+                                                    .foregroundStyle(Color(white: 0.65))
+                                                    .underline()
+                                                if i < AuditLinks.links.count - 1 {
+                                                    Text("·").foregroundStyle(Color(white: 0.4))
+                                                }
+                                            }
+                                        }
+                                        .font(.system(size: 11.5))
+                                    }
                                 }
                                 .frame(
                                     maxWidth: .infinity,
@@ -173,14 +214,14 @@ struct ContentView: View {
                                 ? "Encrypted channel down"
                                 : "Verifying private channel..."
                     )
-                    .font(.system(size: 14, design: .monospaced))
-                    .foregroundStyle(Color(white: 0.3))
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color(white: 0.38))
                     .padding(.top, 10)
                     .padding(.leading, 12)
                     .onTapGesture { isFocused = true }
                 }
                 TextField("", text: $viewModel.messageText, axis: .vertical)
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: 15))
                     .foregroundStyle(.white)
                     .tint(.white)
                     .padding(.top, 10)
@@ -206,31 +247,29 @@ struct ContentView: View {
                                 .foregroundStyle(.black)
                         }
                     }
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(.white))
+                    .frame(width: 40, height: 40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(.white)
+                    )
                     .opacity(viewModel.ready ? 1 : 0.4)
                 }
                 .disabled(!viewModel.ready)
                 .transition(.scale.combined(with: .opacity))
-                .padding(.bottom, 4)
+                .padding(.bottom, 3)
+                .padding(.trailing, 3)
             }
         }
         .padding(6)
         .animation(.bouncy, value: viewModel.messageText.isEmpty)
         .animation(.bouncy, value: viewModel.isLoading)
-        .glassEffect(
-            .regular.tint(.black.opacity(0.6)), in: .rect(cornerRadius: 38)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(white: 0.07))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 38)
-                .stroke(
-                    LinearGradient(
-                        colors: [.white.opacity(0.15), .white.opacity(0.02)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    lineWidth: 0.5
-                )
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color(white: 0.18), lineWidth: 1)
         )
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
@@ -245,7 +284,7 @@ struct MessageBubble: View {
             HStack {
                 Spacer()
                 Text(message.text)
-                    .font(.system(size: 14, design: .monospaced))
+                    .font(.system(size: 15))
                     .foregroundStyle(.black)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
@@ -263,12 +302,19 @@ struct MessageBubble: View {
                 }
             }
         } else {
-            VStack(alignment: .leading, spacing: 6) {
-                MarkdownText(text: message.text)
-                    .textSelection(.enabled)
+            HStack {
+                VStack(alignment: .leading, spacing: 6) {
+                    MarkdownText(text: message.text)
+                        .textSelection(.enabled)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(Color(white: 0.11))
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                )
+                Spacer(minLength: 30)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.trailing, 20)
             .contextMenu {
                 Button {
                     UIPasteboard.general.string = message.text
