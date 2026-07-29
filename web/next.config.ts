@@ -30,7 +30,20 @@ const nextConfig: NextConfig = {
   generateBuildId: async () =>
     process.env.RAILWAY_GIT_COMMIT_SHA ?? null,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      // share assets must be embeddable by other sites (og cards, previews)
+      {
+        source: "/(og.png|logo.png|icon.png)",
+        headers: [
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+          { key: "Cache-Control", value: "public, max-age=3600" },
+        ],
+      },
+      {
+        source: "/((?!og.png|logo.png|icon.png).*)",
+        headers: securityHeaders,
+      },
+    ];
   },
 };
 
