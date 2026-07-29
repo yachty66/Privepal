@@ -152,6 +152,11 @@ export default function Home() {
     }
   }, [active?.slug]);
 
+  // an edit index is only meaningful within the chat it was opened in
+  useEffect(() => {
+    setEditing(null);
+  }, [activeId]);
+
   const persist = useCallback((next: Chat[]) => {
     setChats(next);
     saveChats(next);
@@ -201,9 +206,28 @@ export default function Home() {
       setActiveId(chat.id);
     }
 
+    setInput("");
+    await stream(chat, base, chat.messages, text);
+  }
+
+  // edit an earlier user message and continue the chat from there:
+  // everything after the edited message is discarded
+  async function resend(index: number, text: string) {
+    const t = text.trim();
+    if (!t || busy || !ready || !active) return;
+    setEditing(null);
+    await stream(active, chats, active.messages.slice(0, index), t);
+  }
+
+  async function stream(
+    chat: Chat,
+    base: Chat[],
+    keptMessages: Message[],
+    text: string
+  ) {
     const userMsg: Message = { role: "user", content: text };
     const title =
-      chat.messages.length === 0
+      keptMessages.length === 0
         ? text.slice(0, 40) + (text.length > 40 ? "..." : "")
         : chat.title;
 
@@ -211,7 +235,7 @@ export default function Home() {
       ...chat,
       title,
       model,
-      messages: [...chat.messages, userMsg],
+      messages: [...keptMessages, userMsg],
       updatedAt: Date.now(),
     };
     const updateWorking = (w: Chat) => {
@@ -219,7 +243,6 @@ export default function Home() {
       persist(base.map((c) => (c.id === w.id ? w : c)));
     };
     updateWorking(working);
-    setInput("");
     setBusy(true);
     setThinking(false);
 
@@ -705,30 +728,96 @@ export default function Home() {
                     m.role === "user" ? "items-end" : "items-start"
                   }`}
                 >
-                  <div
-                    className={`max-w-[85%] select-text rounded-2xl px-4 py-2.5 ${
-                      m.role === "user"
-                        ? "whitespace-pre-wrap bg-white text-[15px] leading-relaxed text-black"
-                        : "bg-neutral-900 text-neutral-100"
-                    }`}
-                  >
-                    {m.role === "assistant" ? (
-                      m.content ? (
-                        <Markdown>{m.content}</Markdown>
-                      ) : busy && i === active.messages.length - 1 ? (
-                        "..."
-                      ) : (
-                        ""
-                      )
-                    ) : (
-                      m.content
-                    )}
-                  </div>
-                  {m.content && (
-                    <CopyButton
-                      text={m.content}
-                      className={m.role === "user" ? "mr-1" : "ml-1"}
-                    />
+                  {m.role === "user" && editing?.index === i ? (
+                    <div className="w-full max-w-[85%]">
+                      <textarea
+                        value={editing.text}
+                        onChange={(e) =>
+                          setEditing({ index: i, text: e.target.value })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            resend(i, editing.text);
+                          }
+                          if (e.key === "Escape") setEditing(null);
+                        }}
+                        autoFocus
+                        rows={Math.min(
+                          8,
+                          editing.text.split("\n").length + 1
+                        )}
+                        className="w-full resize-none rounded-2xl border border-neutral-700 bg-neutral-900 px-4 py-2.5 text-[15px] leading-relaxed outline-none focus:border-neutral-500"
+                      />
+                      <div className="mt-1.5 flex justify-end gap-2 text-xs">
+                        <button
+                          onClick={() => setEditing(null)}
+                          className="rounded-md px-2.5 py-1 text-neutral-400 hover:text-neutral-200"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => resend(i, editing.text)}
+                          disabled={!editing.text.trim()}
+                          className="rounded-md bg-white px-2.5 py-1 font-medium text-black hover:bg-neutral-200 disabled:opacity-40"
+                        >
+                          Send
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        className={`max-w-[85%] select-text rounded-2xl px-4 py-2.5 ${
+                          m.role === "user"
+                            ? "whitespace-pre-wrap bg-white text-[15px] leading-relaxed text-black"
+                            : "bg-neutral-900 text-neutral-100"
+                        }`}
+                      >
+                        {m.role === "assistant" ? (
+                          m.content ? (
+                            <Markdown>{m.content}</Markdown>
+                          ) : busy && i === active.messages.length - 1 ? (
+                            "..."
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          m.content
+                        )}
+                      </div>
+                      {m.content && (
+                        <div
+                          className={`flex gap-3 ${
+                            m.role === "user" ? "mr-1" : "ml-1"
+                          }`}
+                        >
+                          <CopyButton text={m.content} />
+                          {m.role === "user" && !busy && (
+                            <button
+                              onClick={() =>
+                                setEditing({ index: i, text: m.content })
+                              }
+                              title="Edit and resend"
+                              className="mt-1 flex items-center gap-1 text-[11px] text-neutral-600 opacity-60 transition-opacity hover:text-neutral-300 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                className="h-3.5 w-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                              </svg>
+                              edit
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ))

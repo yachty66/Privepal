@@ -4,8 +4,12 @@ import Observation
 @Observable
 class ChatViewModel {
     var store = ChatStore()
-    var activeChatId: UUID?
+    var activeChatId: UUID? {
+        didSet { if oldValue != activeChatId { editingMessageId = nil } }
+    }
     var messageText: String = ""
+    // set while a sent message is being edited for resend
+    var editingMessageId: UUID? = nil
     var isLoading: Bool = false
     var isThinking: Bool = false
     var model: AIModel = .fast
@@ -92,9 +96,26 @@ class ChatViewModel {
     }
 
     func newChat() {
-        let chat = Chat.new(model: model.rawValue)
-        store.upsert(chat)
-        activeChatId = chat.id
+        // reuse an existing empty chat instead of stacking up "New chat"
+        // entries (same behavior as the web app)
+        if let empty = store.chats.first(where: { $0.messages.isEmpty }) {
+            activeChatId = empty.id
+        } else {
+            let chat = Chat.new(model: model.rawValue)
+            store.upsert(chat)
+            activeChatId = chat.id
+        }
+    }
+
+    func beginEdit(_ message: Message) {
+        guard message.isUser, !isLoading else { return }
+        messageText = message.text
+        editingMessageId = message.id
+    }
+
+    func cancelEdit() {
+        editingMessageId = nil
+        messageText = ""
     }
 
     func sendMessage() {
@@ -102,6 +123,14 @@ class ChatViewModel {
         guard !text.isEmpty, !isLoading, ready else { return }
 
         var chat = activeChat ?? Chat.new(model: model.rawValue)
+        // resending an edited message: the chat continues from that point,
+        // discarding the old message and everything after it
+        if let editId = editingMessageId {
+            if let idx = chat.messages.firstIndex(where: { $0.id == editId }) {
+                chat.messages.removeSubrange(idx...)
+            }
+            editingMessageId = nil
+        }
         if chat.messages.isEmpty {
             chat.title = String(text.prefix(40))
         }

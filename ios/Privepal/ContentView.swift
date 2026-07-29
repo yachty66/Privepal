@@ -79,8 +79,11 @@ struct ContentView: View {
                             {
                                 LazyVStack(spacing: 12) {
                                     ForEach(chat.messages) { message in
-                                        MessageBubble(message: message)
-                                            .id(message.id)
+                                        MessageBubble(message: message) {
+                                            viewModel.beginEdit($0)
+                                            isFocused = true
+                                        }
+                                        .id(message.id)
                                     }
                                     if viewModel.isThinking {
                                         HStack {
@@ -214,6 +217,42 @@ struct ContentView: View {
     }
 
     private var inputBar: some View {
+        VStack(spacing: 0) {
+            if viewModel.editingMessageId != nil {
+                HStack(spacing: 6) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text("Editing message, resending rewrites the chat from there")
+                        .font(.system(size: 12))
+                    Spacer()
+                    Button {
+                        viewModel.cancelEdit()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 11, weight: .semibold))
+                    }
+                }
+                .foregroundStyle(Color(white: 0.55))
+                .padding(.horizontal, 12)
+                .padding(.top, 8)
+                .padding(.bottom, 2)
+            }
+            inputRow
+        }
+        .animation(.bouncy, value: viewModel.editingMessageId)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(white: 0.07))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color(white: 0.18), lineWidth: 1)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+    }
+
+    private var inputRow: some View {
         HStack(alignment: .bottom, spacing: 12) {
             ZStack(alignment: .topLeading) {
                 if viewModel.messageText.isEmpty {
@@ -293,6 +332,7 @@ struct ContentView: View {
 
 struct MessageBubble: View {
     let message: Message
+    var onEdit: ((Message) -> Void)? = nil
 
     var body: some View {
         if message.isUser {
@@ -314,6 +354,13 @@ struct MessageBubble: View {
                     UIPasteboard.general.string = message.text
                 } label: {
                     Label("Copy", systemImage: "doc.on.doc")
+                }
+                if let onEdit {
+                    Button {
+                        onEdit(message)
+                    } label: {
+                        Label("Edit & resend", systemImage: "pencil")
+                    }
                 }
             }
         } else {

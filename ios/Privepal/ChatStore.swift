@@ -25,7 +25,9 @@ class ChatStore {
         guard let data = try? Data(contentsOf: Self.fileURL),
               let decoded = try? JSONDecoder().decode([Chat].self, from: data)
         else { return }
-        chats = decoded
+        // drop empty chats left over from earlier sessions (web parity)
+        chats = decoded.filter { !$0.messages.isEmpty }
+        if chats.count != decoded.count { save() }
     }
 
     func save() {
