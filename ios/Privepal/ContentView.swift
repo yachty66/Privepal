@@ -189,6 +189,16 @@ struct ContentView: View {
         }
         .background(Color.black.ignoresSafeArea())
         .preferredColorScheme(.dark)
+        // swipe right anywhere to open previous chats (like the web sidebar)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 30)
+                .onEnded { v in
+                    if v.translation.width > 70,
+                       abs(v.translation.height) < 60 {
+                        showChats = true
+                    }
+                }
+        )
         .sheet(isPresented: $showShield) {
             ShieldView(
                 channelOk: viewModel.channelOk,
@@ -214,14 +224,14 @@ struct ContentView: View {
                                 ? "Encrypted channel down"
                                 : "Verifying private channel..."
                     )
-                    .font(.system(size: 15))
+                    .font(.system(size: 17))
                     .foregroundStyle(Color(white: 0.38))
                     .padding(.top, 10)
                     .padding(.leading, 12)
                     .onTapGesture { isFocused = true }
                 }
                 TextField("", text: $viewModel.messageText, axis: .vertical)
-                    .font(.system(size: 15))
+                    .font(.system(size: 17))
                     .foregroundStyle(.white)
                     .tint(.white)
                     .padding(.top, 10)
@@ -231,11 +241,10 @@ struct ContentView: View {
             }
             .frame(minHeight: 44)
 
-            if !viewModel.messageText.isEmpty || viewModel.isLoading {
-                Button {
-                    viewModel.isLoading
-                        ? viewModel.stop() : viewModel.sendMessage()
-                } label: {
+            Button {
+                viewModel.isLoading
+                    ? viewModel.stop() : viewModel.sendMessage()
+            } label: {
                     ZStack {
                         if viewModel.isLoading {
                             Image(systemName: "stop.fill")
@@ -252,13 +261,19 @@ struct ContentView: View {
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .fill(.white)
                     )
-                    .opacity(viewModel.ready ? 1 : 0.4)
-                }
-                .disabled(!viewModel.ready)
-                .transition(.scale.combined(with: .opacity))
-                .padding(.bottom, 3)
-                .padding(.trailing, 3)
+                    .opacity(
+                        viewModel.isLoading
+                            ? 1
+                            : (viewModel.ready
+                                && !viewModel.messageText.isEmpty ? 1 : 0.35)
+                    )
             }
+            .disabled(
+                !viewModel.isLoading
+                    && (!viewModel.ready || viewModel.messageText.isEmpty)
+            )
+            .padding(.bottom, 3)
+            .padding(.trailing, 3)
         }
         .padding(6)
         .animation(.bouncy, value: viewModel.messageText.isEmpty)
@@ -284,7 +299,7 @@ struct MessageBubble: View {
             HStack {
                 Spacer()
                 Text(message.text)
-                    .font(.system(size: 15))
+                    .font(.system(size: 16))
                     .foregroundStyle(.black)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)

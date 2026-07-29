@@ -90,6 +90,9 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [desktopSidebar, setDesktopSidebar] = useState(true);
   const [thinking, setThinking] = useState(false);
+  const [editing, setEditing] = useState<{ index: number; text: string } | null>(
+    null
+  );
   const [channelOk, setChannelOk] = useState<boolean | null>(null);
   const [verifyStep, setVerifyStep] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);

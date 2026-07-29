@@ -88,17 +88,17 @@ struct MarkdownText: View {
                 switch block {
                 case .paragraph(let s):
                     Text(s)
-                        .font(.system(size: 15))
+                        .font(.system(size: 16))
                         .foregroundStyle(Color(white: 0.9))
                 case .heading(let s):
                     Text(s)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                         .padding(.top, 2)
                 case .code(let s):
                     ScrollView(.horizontal, showsIndicators: false) {
                         Text(s)
-                            .font(.system(size: 13, design: .monospaced))
+                            .font(.system(size: 14, design: .monospaced))
                             .foregroundStyle(Color(white: 0.85))
                             .padding(10)
                     }
@@ -110,7 +110,7 @@ struct MarkdownText: View {
                             HStack(alignment: .top, spacing: 8) {
                                 Text("•").foregroundStyle(Color(white: 0.5))
                                 Text(item)
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 16))
                                     .foregroundStyle(Color(white: 0.9))
                             }
                         }
