@@ -19,22 +19,32 @@ export const metadata: Metadata = {
   other: {
     "privepal-commit": process.env.RAILWAY_GIT_COMMIT_SHA ?? "dev",
   },
-  title: "Privepal",
+  title: "Privepal - AI chat nobody can read",
   description:
-    "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
+    "Fast, private AI chat. Confidential compute, no accounts, no stored chats. Open source and auditable.",
   openGraph: {
-    title: "Privepal",
+    title: "Privepal - AI chat nobody can read",
     description:
-      "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
+      "Fast, private AI chat. Confidential compute, no accounts, no stored chats. Open source and auditable.",
     url: "https://privepal.com",
     siteName: "Privepal",
     type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+        alt: "Privepal: fast, private AI chat",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privepal",
+    title: "Privepal - AI chat nobody can read",
     description:
-      "Fast, private AI chat. Confidential compute, no accounts, no stored chats.",
+      "Fast, private AI chat. Confidential compute, no accounts, no stored chats. Open source and auditable.",
+    images: ["/og.png"],
   },
 };
 
