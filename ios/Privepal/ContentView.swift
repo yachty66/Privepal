@@ -255,29 +255,27 @@ struct MessageBubble: View {
                     )
             }
             .padding(.leading, 60)
+            .contextMenu {
+                Button {
+                    UIPasteboard.general.string = message.text
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                }
+            }
         } else {
             VStack(alignment: .leading, spacing: 6) {
-                Text(
-                    (try? AttributedString(
-                        markdown: message.text,
-                        options: .init(
-                            interpretedSyntax:
-                                .inlineOnlyPreservingWhitespace
-                        )
-                    )) ?? AttributedString(message.text)
-                )
-                .font(.system(size: 15))
-                .foregroundStyle(Color(white: 0.9))
-                .textSelection(.enabled)
-
-                if let ttft = message.ttftMs {
-                    Text("first token \(ttft)ms")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundStyle(Color(white: 0.35))
-                }
+                MarkdownText(text: message.text)
+                    .textSelection(.enabled)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.trailing, 20)
+            .contextMenu {
+                Button {
+                    UIPasteboard.general.string = message.text
+                } label: {
+                    Label("Copy", systemImage: "doc.on.doc")
+                }
+            }
         }
     }
 }
@@ -286,11 +284,24 @@ struct ChatListView: View {
     @Bindable var viewModel: ChatViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var confirmWipe = false
+    @State private var chatToDelete: Chat?
+    @State private var search = ""
+
+    // client-side search across titles and full message content;
+    // nothing ever leaves the device
+    private var visibleChats: [Chat] {
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        guard !q.isEmpty else { return viewModel.store.chats }
+        return viewModel.store.chats.filter { c in
+            c.title.lowercased().contains(q)
+                || c.messages.contains { $0.text.lowercased().contains(q) }
+        }
+    }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(viewModel.store.chats) { chat in
+                ForEach(visibleChats) { chat in
                     Button {
                         viewModel.activeChatId = chat.id
                         dismiss()
@@ -311,8 +322,8 @@ struct ChatListView: View {
                     .listRowBackground(Color(white: 0.08))
                 }
                 .onDelete { indexSet in
-                    for i in indexSet {
-                        viewModel.deleteChat(viewModel.store.chats[i])
+                    if let i = indexSet.first {
+                        chatToDelete = visibleChats[i]
                     }
                 }
 
@@ -329,6 +340,20 @@ struct ChatListView: View {
             .background(Color.black)
             .navigationTitle("Chats")
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $search, prompt: "Search chats")
+            .confirmationDialog(
+                "Delete \"\(chatToDelete?.title ?? "this chat")\"? This cannot be undone.",
+                isPresented: Binding(
+                    get: { chatToDelete != nil },
+                    set: { if !$0 { chatToDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Delete chat", role: .destructive) {
+                    if let c = chatToDelete { viewModel.deleteChat(c) }
+                    chatToDelete = nil
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Done") { dismiss() }

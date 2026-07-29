@@ -34,6 +34,8 @@ struct ShieldView: View {
                         title: "No account, no tracking",
                         body: "No sign-up, no analytics, no third-party connections of any kind. There is nothing to link your conversations to you."
                     )
+                    auditSection
+
                     item(
                         badge: .trust,
                         title: "Our relay server",
@@ -52,6 +54,49 @@ struct ShieldView: View {
             }
         }
         .preferredColorScheme(.dark)
+    }
+
+    private let auditPrompt = "privepal.com is a private AI chat that claims: chat history is stored only client-side, no tracking and no analytics, a CSP blocks all third-party network connections, and messages are relayed to confidential-compute inference without being logged or stored. Fetch https://privepal.com/audit-bundle.txt : it contains the complete source code of the privacy-critical files of the running app. Verify each claim against the actual code and give an honest verdict, including what cannot be verified from source code alone."
+
+    private var auditLinks: [(String, URL)] {
+        let q = auditPrompt.addingPercentEncoding(
+            withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return [
+            ("Ask Claude", URL(string: "https://claude.ai/new?q=\(q)")!),
+            ("Ask ChatGPT", URL(string: "https://chatgpt.com/?q=\(q)")!),
+        ]
+    }
+
+    private var auditSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Don't take our word for it")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(.white)
+            Text("Our code is open source. One tap sends it to an AI you already trust, with the question: is this really as private as they claim?")
+                .font(.system(size: 13))
+                .foregroundStyle(Color(white: 0.6))
+            HStack(spacing: 10) {
+                ForEach(auditLinks, id: \.0) { name, url in
+                    Link(destination: url) {
+                        Text(name)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color(white: 0.85))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color(white: 0.3), lineWidth: 1)
+                            )
+                    }
+                }
+            }
+            .padding(.top, 2)
+        }
+        .padding(14)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color(white: 0.2), lineWidth: 1)
+        )
     }
 
     private enum Badge {

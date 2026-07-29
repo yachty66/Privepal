@@ -22,9 +22,17 @@ protocol ChatServiceProtocol {
     func getStreamingResponse(for messages: [Message], model: String)
         -> AsyncThrowingStream<StreamDelta, Error>
     func shieldStatus() async throws -> ShieldStatus
+    func serverReachable() async -> Bool
 }
 
 class PrivepalService: ChatServiceProtocol {
+
+    func serverReachable() async -> Bool {
+        let url = PrivepalAPI.base.appendingPathComponent("api/version")
+        guard let (_, resp) = try? await URLSession.shared.data(from: url)
+        else { return false }
+        return (resp as? HTTPURLResponse)?.statusCode == 200
+    }
 
     func shieldStatus() async throws -> ShieldStatus {
         let url = PrivepalAPI.base.appendingPathComponent("api/shield")

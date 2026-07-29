@@ -70,21 +70,23 @@ class ChatViewModel {
     func runVerification() {
         verifyStep = 0
         channelOk = nil
+        // each step gates on a real network event, with minimum display
+        // times so the sequence stays readable on fast connections
         Task { @MainActor in
-            async let check: Void = {
-                do {
-                    let status = try await service.shieldStatus()
-                    self.channelOk = status.proxyOk
-                } catch {
-                    self.channelOk = false
-                }
+            async let reach = service.serverReachable()
+            try? await Task.sleep(for: .milliseconds(700))
+            _ = await reach
+            verifyStep = 1
+
+            async let shield: Bool = {
+                (try? await self.service.shieldStatus())?.proxyOk ?? false
             }()
             try? await Task.sleep(for: .milliseconds(900))
-            verifyStep = 1
-            try? await Task.sleep(for: .milliseconds(1100))
+            let ok = await shield
             verifyStep = 2
-            await check
-            try? await Task.sleep(for: .milliseconds(900))
+
+            try? await Task.sleep(for: .milliseconds(700))
+            channelOk = ok
             verifyStep = 3
         }
     }
