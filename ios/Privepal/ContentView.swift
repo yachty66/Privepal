@@ -3,8 +3,9 @@ import SwiftUI
 struct ContentView: View {
     @State private var viewModel = ChatViewModel()
     @FocusState private var isFocused: Bool
-    @State private var showShield = false
-    @State private var showChats = false
+    // launch-arg overrides support App Store screenshot automation
+    @State private var showShield = CommandLine.arguments.contains("-shield")
+    @State private var showChats = CommandLine.arguments.contains("-chats")
 
     var body: some View {
         VStack(spacing: 0) {

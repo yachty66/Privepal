@@ -20,8 +20,46 @@ class ChatViewModel {
 
     init(service: ChatServiceProtocol = PrivepalService()) {
         self.service = service
+        // "-demo" launch argument seeds sample chats for App Store screenshots
+        if CommandLine.arguments.contains("-demo"), store.chats.isEmpty {
+            seedDemoData()
+        }
         activeChatId = store.chats.first?.id
+        if CommandLine.arguments.contains("-chat2"), store.chats.count > 1 {
+            activeChatId = store.chats[1].id
+        }
         runVerification()
+    }
+
+    private func seedDemoData() {
+        var travel = Chat.new(model: AIModel.fast.rawValue)
+        travel.title = "Weekend trip to the Alps"
+        travel.messages = [
+            Message(text: "Plan me a 2-day hiking trip near Garmisch, nothing too hard", isUser: true),
+            Message(
+                text: "Here's a relaxed 2-day plan:\n\nDay 1: Partnach Gorge and Eckbauer\nStart at the Olympic ski stadium, walk the dramatic Partnach Gorge (about 30 minutes), then take the easy trail up to Eckbauer Alm for lunch with a view. Cable car back down.\n\nDay 2: Eibsee loop\nTrain to Eibsee and walk the lake loop, about 7 km of flat, stunning trail beneath the Zugspitze. Finish with a swim spot on the north shore.\n\nBoth days are beginner-friendly with mountain-hut food along the way. Want me to add rain alternatives?",
+                isUser: false, ttftMs: 214
+            ),
+        ]
+        var health = Chat.new(model: AIModel.smart.rawValue)
+        health.title = "Question I'd rather keep private"
+        health.messages = [
+            Message(text: "I've been having trouble sleeping and I don't want this saved anywhere", isUser: true),
+            Message(
+                text: "Understood, and just so you know: this conversation exists only on your phone.\n\nA few evidence-backed things that help most people:\n\n1. Fixed wake time, even on weekends. It anchors your whole rhythm.\n2. No screens in the last 30 minutes, dim, boring light instead.\n3. If you can't sleep after 20 minutes, get up and read something dull until drowsy.\n4. Caffeine has a 6-hour half-life. A 4 pm coffee is still half active at 10 pm.\n\nIf this has lasted more than a month, a doctor can rule out the medical causes. Want a simple wind-down routine to try this week?",
+                isUser: false, ttftMs: 189
+            ),
+        ]
+        var code = Chat.new(model: AIModel.fast.rawValue)
+        code.title = "Explain confidential computing"
+        code.messages = [
+            Message(text: "how do you keep my messages private?", isUser: true),
+            Message(
+                text: "Your messages are processed inside sealed hardware:\n\n1. On-device storage: your chats live only on this iPhone, encrypted at rest.\n2. Sealed inference: the AI runs in confidential-computing enclaves. The memory is encrypted with keys held in the silicon itself.\n3. Verified hardware: before anything is sent, the hardware cryptographically proves what code it is running.\n\nNobody can read your conversations. Not the operator, not the datacenter, not even Privepal.",
+                isUser: false, ttftMs: 203
+            ),
+        ]
+        store.chats = [code, health, travel]
     }
 
     var activeChat: Chat? {
